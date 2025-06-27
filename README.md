@@ -1,6 +1,8 @@
 # fcp-mpdp-backend
 
-Core delivery platform Node.js Backend Template.
+Backend API for the Making Payment Data Public (MPDP) service.
+
+MPDP is part of the Farming and Countryside Programme (FCP).
 
 - [Requirements](#requirements)
   - [Node.js](#nodejs)
