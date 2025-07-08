@@ -55,7 +55,7 @@ services:
         condition: service_healthy
     volumes:
       - ./changelog:/liquibase/changelog
-    command: --url=jdbc:postgresql://postgres:5432/fcp_mpdp_pg_poc --username=postgres --password=postgres --changelog-file=changelog/db.changelog.xml update
+    command: --url=jdbc:postgresql://postgres:5432/fcp_mpdp_backend --username=postgres --password=postgres --changelog-file=changelog/db.changelog.xml update
     networks:
       - fcp-mpdp
 
