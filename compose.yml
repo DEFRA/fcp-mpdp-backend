@@ -1,4 +1,27 @@
 services:
+  fcp-mpdp-backend:
+    build:
+      context: .
+      target: development
+    ports:
+      - '3001:3001'
+    links:
+      - 'localstack:localstack'
+    depends_on:
+      localstack:
+        condition: service_healthy
+    env_file:
+      - 'compose/aws.env'
+    environment:
+      PORT: 3001
+      NODE_ENV: development
+      LOCALSTACK_ENDPOINT: http://localstack:4566
+    networks:
+      - fcp-mpdp
+    volumes:
+      - ./src:/home/node/src
+      - ./package.json:/home/node/package.json
+
   localstack:
     image: localstack/localstack:3.0.2
     ports:
@@ -20,7 +43,7 @@ services:
       start_period: 5s
       retries: 3
     networks:
-      - cdp-tenant
+      - fcp-mpdp
 
   redis:
     image: redis:7.2.3-alpine3.18
@@ -28,59 +51,9 @@ services:
       - '6379:6379'
     restart: always
     networks:
-      - cdp-tenant
-
-  ################################################################################
-
-  # frontend:
-  #   image: defradigital/frontend:${FRONTEND_VERSION:-latest}
-  #   ports:
-  #     - '3000:3000'
-  #   links:
-  #     - 'localstack:localstack'
-  #     - 'redis:redis'
-  #   depends_on:
-  #     localstack:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_started
-  #   env_file:
-  #     - 'compose/aws.env'
-  #   environment:
-  #     PORT: 3000
-  #     NODE_ENV: development
-  #     REDIS_HOST: redis
-  #     LOCALSTACK_ENDPOINT: http://localstack:4566
-  #     USE_SINGLE_INSTANCE_CACHE: true
-  #   networks:
-  #     - cdp-tenant
-
-  fcp-mpdp-backend:
-    build:
-      context: .
-      target: development
-    ports:
-      - '3001:3001'
-    links:
-      - 'localstack:localstack'
-    depends_on:
-      localstack:
-        condition: service_healthy
-    env_file:
-      - 'compose/aws.env'
-    environment:
-      PORT: 3001
-      NODE_ENV: development
-      LOCALSTACK_ENDPOINT: http://localstack:4566
-    networks:
-      - cdp-tenant
-    volumes:
-      - ./src:/home/node/src
-      - ./package.json:/home/node/package.json
-
-################################################################################
+      - fcp-mpdp
 
 networks:
-  cdp-tenant:
+  fcp-mpdp:
     driver: bridge
-    name: cdp-tenant
+    name: fcp-mpdp
