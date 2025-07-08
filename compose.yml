@@ -8,6 +8,10 @@ services:
     links:
       - 'localstack:localstack'
     depends_on:
+      postgres:
+        condition: service_healthy
+      liquibase:
+        condition: service_started
       localstack:
         condition: service_healthy
     env_file:
@@ -16,11 +20,44 @@ services:
       PORT: 3001
       NODE_ENV: development
       LOCALSTACK_ENDPOINT: http://localstack:4566
+      POSTGRES_HOST: postgres
+      POSTGRES_HOST_READ: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_GET_TOKEN_FROM_RDS: false
     networks:
       - fcp-mpdp
     volumes:
       - ./src:/home/node/src
       - ./package.json:/home/node/package.json
+
+  postgres:
+    image: postgres:16.6
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fcp_mpdp_backend
+    networks:
+      - fcp-mpdp
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      retries: 5
+      start_period: 1s
+      timeout: 10s
+
+  liquibase:
+    image: liquibase/liquibase
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./changelog:/liquibase/changelog
+    command: --url=jdbc:postgresql://postgres:5432/fcp_mpdp_pg_poc --username=postgres --password=postgres --changelog-file=changelog/db.changelog.xml update
+    networks:
+      - fcp-mpdp
 
   localstack:
     image: localstack/localstack:3.0.2

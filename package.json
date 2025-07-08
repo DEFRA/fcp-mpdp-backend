@@ -31,14 +31,17 @@
   ],
   "license": "OGL-UK-3.0",
   "dependencies": {
+    "@aws-sdk/credential-providers": "3.840.0",
     "@defra/hapi-tracing": "1.22.0",
     "@elastic/ecs-pino-format": "1.5.0",
     "@hapi/boom": "10.0.1",
     "@hapi/hapi": "21.4.0",
+    "@json2csv/node": "7.0.6",
     "aws-embedded-metrics": "4.2.0",
     "aws4": "1.13.2",
     "convict": "6.2.4",
     "convict-format-with-validator": "6.2.0",
+    "fuse.js": "7.1.0",
     "global-agent": "3.0.0",
     "hapi-pino": "12.1.0",
     "hapi-pulse": "3.0.1",
@@ -47,8 +50,10 @@
     "mongo-locks": "3.0.2",
     "mongodb": "6.17.0",
     "node-fetch": "3.3.2",
+    "pg": "8.16.3",
     "pino": "9.7.0",
     "pino-pretty": "13.0.0",
+    "sequelize": "6.37.7",
     "undici": "7.10.0"
   },
   "devDependencies": {
