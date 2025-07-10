@@ -16,9 +16,9 @@ export default defineConfig({
         'coverage',
         '**/node_modules/**',
         '**/test/**',
-        '.server',
         'src/index.js'
       ]
-    }
+    },
+    setupFiles: ['.vite/setup-files.js']
   }
 })

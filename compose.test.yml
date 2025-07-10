@@ -25,7 +25,6 @@ services:
     volumes:
       - ./src:/home/node/src
       - ./test:/home/node/test
-      - ./coverage:/home/node/coverage
       - ./package.json:/home/node/package.json
     networks:
       - fcp-mpdp
