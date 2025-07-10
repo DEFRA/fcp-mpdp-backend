@@ -22,7 +22,8 @@
     "setup:husky": "node -e \"try { (await import('husky')).default() } catch (e) { if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e }\" --input-type module",
     "start": "NODE_ENV=production node --use-strict .",
     "test": "TZ=UTC vitest run --coverage",
-    "test:watch": "TZ=UTC vitest"
+    "test:watch": "TZ=UTC vitest",
+    "docker:test": "docker compose down -v && docker compose -f compose.yml -f compose.test.yml run --build --rm 'fcp-mpdp-backend'"
   },
   "author": "Defra DDTS",
   "contributors": [
