@@ -1,0 +1,9 @@
+services:
+  fcp-mpdp-backend:
+    command: npm run test:watch
+    volumes:
+      - ./.git:/home/node/.git
+      - ./src/:/home/node/src
+      - ./test/:/home/node/test
+      - ./coverage:/home/node/coverage
+      - ./package.json:/home/node/package.json

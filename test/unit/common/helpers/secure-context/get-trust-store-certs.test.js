@@ -1,4 +1,5 @@
-import { getTrustStoreCerts } from './get-trust-store-certs.js'
+import { describe, test, expect } from 'vitest'
+import { getTrustStoreCerts } from '../../../../../src/common/helpers/secure-context/get-trust-store-certs.js'
 
 describe('#getTrustStoreCerts', () => {
   const mockProcessEnvWithCerts = {
