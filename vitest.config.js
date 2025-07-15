@@ -7,9 +7,7 @@ export default defineConfig({
     clearMocks: true,
     coverage: {
       provider: 'v8',
-      reportOnFailure: true,
       reportsDirectory: './coverage',
-      clean: false,
       reporter: ['text', 'lcov'],
       include: ['src/**'],
       exclude: [...configDefaults.exclude, 'coverage', '**/test/**']
