@@ -23,7 +23,7 @@ MPDP is part of the Farming and Countryside Programme (FCP).
   - [Production image](#production-image)
   - [Docker Compose](#docker-compose)
   - [Dependabot](#dependabot)
-  - [SonarCloud](#sonarcloud)
+  - [SonarQube Cloud](#sonarqube-cloud)
 - [Licence](#licence)
   - [About the licence](#about-the-licence)
 
@@ -185,9 +185,9 @@ npm run docker:dev
 We have added an example dependabot configuration file to the repository. You can enable it by renaming
 the [.github/example.dependabot.yml](.github/example.dependabot.yml) to `.github/dependabot.yml`
 
-### SonarCloud
+### SonarQube Cloud
 
-Instructions for setting up SonarCloud can be found in [sonar-project.properties](./sonar-project.properties)
+Instructions for setting up SonarQube Cloud can be found in [sonar-project.properties](./sonar-project.properties)
 
 ## Licence
 
