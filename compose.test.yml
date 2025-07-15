@@ -5,7 +5,3 @@ services:
     image: fcp-mpdp-backend-development
     container_name: fcp-mpdp-backend-test
     command: npm test
-    volumes:
-      - ./src:/home/node/src
-      - ./test:/home/node/test
-      - ./package.json:/home/node/package.json
