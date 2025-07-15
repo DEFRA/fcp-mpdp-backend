@@ -38,6 +38,7 @@ jobs:
         with:
           path: ./changelog
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
 
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarcloud-github-action@master
