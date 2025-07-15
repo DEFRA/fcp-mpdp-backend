@@ -177,7 +177,7 @@ A local environment with:
 - A commented out frontend example.
 
 ```bash
-docker compose up --build -d
+npm run docker:dev
 ```
 
 ### Dependabot

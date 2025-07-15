@@ -13,9 +13,9 @@ EXPOSE ${PORT} ${PORT_DEBUG}
 
 COPY --chown=node:node package*.json ./
 RUN npm install
-COPY --chown=node:node ./src ./src
+COPY --chown=node:node . .
 
-CMD [ "npm", "run", "dev" ]
+CMD [ "npm", "run", "docker:dev" ]
 
 FROM defradigital/node:${PARENT_VERSION} AS production
 ARG PARENT_VERSION

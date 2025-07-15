@@ -3,21 +3,16 @@ import { defineConfig, configDefaults } from 'vitest/config'
 export default defineConfig({
   test: {
     globals: true,
-    include: ['**/test/**/*.test.js'],
+    environment: 'node',
     clearMocks: true,
     coverage: {
       provider: 'v8',
       reportOnFailure: true,
+      reportsDirectory: './coverage',
       clean: false,
-      reporter: ['lcov'],
-      include: ['src/**/*.js'],
-      exclude: [
-        ...configDefaults.exclude,
-        'coverage',
-        '**/node_modules/**',
-        '**/test/**',
-        'src/index.js'
-      ]
+      reporter: ['text', 'lcov'],
+      include: ['src/**'],
+      exclude: [...configDefaults.exclude, 'coverage', '**/test/**']
     },
     setupFiles: ['.vite/setup-files.js']
   }
