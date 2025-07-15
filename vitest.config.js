@@ -10,7 +10,7 @@ export default defineConfig({
       reportsDirectory: './coverage',
       reporter: ['text', 'lcov'],
       include: ['src/**'],
-      exclude: [...configDefaults.exclude, 'coverage']
+      exclude: [...configDefaults.exclude, 'coverage', '**/test/**']
     },
     setupFiles: ['.vite/setup-files.js']
   }

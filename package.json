@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "NODE_ENV=development npm run server:watch",
     "dev:debug": "NODE_ENV=development npm run server:debug",
-    "docker:dev": "npm run dev",
+    "docker:dev": "docker compose up",
     "format": "prettier --write \"**/*.{cjs,js,json,md}\"",
     "format:check": "prettier --check \"**/*.{cjs,js,json,md}\"",
     "git:pre-commit-hook": "npm run format:check && npm run lint",
@@ -22,19 +22,28 @@
     "setup:husky": "node -e \"try { (await import('husky')).default() } catch (e) { if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e }\" --input-type module",
     "start": "NODE_ENV=production node --use-strict .",
     "test": "TZ=UTC vitest run --coverage",
-    "test:watch": "TZ=UTC vitest"
+    "test:watch": "TZ=UTC vitest",
+    "docker:test": "docker compose down -v && docker compose -f compose.yml -f compose.test.yml run --build --rm 'fcp-mpdp-backend'",
+    "docker:test:watch": "docker compose down -v && docker compose -f compose.yml -f compose.test.yml -f compose.test.watch.yml run --build --rm 'fcp-mpdp-backend'"
   },
   "author": "Defra DDTS",
+  "contributors": [
+    "John Watson <john.watson1@defra.gov.uk>",
+    "Rana Salem <rana.salem@defra.gov.uk>"
+  ],
   "license": "OGL-UK-3.0",
   "dependencies": {
+    "@aws-sdk/credential-providers": "3.840.0",
     "@defra/hapi-tracing": "1.22.0",
     "@elastic/ecs-pino-format": "1.5.0",
     "@hapi/boom": "10.0.1",
     "@hapi/hapi": "21.4.0",
+    "@json2csv/node": "7.0.6",
     "aws-embedded-metrics": "4.2.0",
     "aws4": "1.13.2",
     "convict": "6.2.4",
     "convict-format-with-validator": "6.2.0",
+    "fuse.js": "7.1.0",
     "global-agent": "3.0.0",
     "hapi-pino": "12.1.0",
     "hapi-pulse": "3.0.1",
@@ -43,8 +52,10 @@
     "mongo-locks": "3.0.2",
     "mongodb": "6.17.0",
     "node-fetch": "3.3.2",
+    "pg": "8.16.3",
     "pino": "9.7.0",
     "pino-pretty": "13.0.0",
+    "sequelize": "6.37.7",
     "undici": "7.10.0"
   },
   "devDependencies": {
