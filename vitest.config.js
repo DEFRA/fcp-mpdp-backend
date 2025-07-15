@@ -7,17 +7,10 @@ export default defineConfig({
     clearMocks: true,
     coverage: {
       provider: 'v8',
-      reportOnFailure: true,
-      clean: false,
-      reporter: ['lcov'],
-      include: ['src/**/*.js'],
-      exclude: [
-        ...configDefaults.exclude,
-        'coverage',
-        '**/node_modules/**',
-        '**/test/**',
-        'src/index.js'
-      ]
+      reportsDirectory: './coverage',
+      reporter: ['text', 'lcov'],
+      include: ['src/**'],
+      exclude: [...configDefaults.exclude, 'coverage', '**/test/**']
     },
     setupFiles: ['.vite/setup-files.js']
   }

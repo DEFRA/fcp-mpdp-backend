@@ -5,31 +5,3 @@ services:
     image: fcp-mpdp-backend-development
     container_name: fcp-mpdp-backend-test
     command: npm test
-    depends_on:
-      postgres:
-        condition: service_healthy
-      liquibase:
-        condition: service_started
-      localstack:
-        condition: service_healthy
-    env_file:
-      - 'compose/aws.env'
-    environment:
-      PORT: 3001
-      NODE_ENV: development
-      POSTGRES_HOST: postgres
-      POSTGRES_HOST_READ: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_GET_TOKEN_FROM_RDS: false
-    volumes:
-      - ./src:/home/node/src
-      - ./test:/home/node/test
-      - ./package.json:/home/node/package.json
-    networks:
-      - fcp-mpdp
-
-networks:
-  fcp-mpdp:
-    driver: bridge
-    name: fcp-mpdp

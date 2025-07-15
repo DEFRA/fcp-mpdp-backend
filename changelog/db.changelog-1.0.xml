@@ -28,13 +28,6 @@
       <column name="scheme_detail" type="VARCHAR(128)" />
       <column name="activity_level" type="VARCHAR(64)" />
     </createTable>
-  </changeSet>
-  <changeSet author="Defra" id="3">
-    <sql dbms="postgresql" endDelimiter=";">
-        CREATE EXTENSION IF NOT EXISTS PG_TRGM
-    </sql>
-  </changeSet>
-  <changeSet author="Defra" id="4">
     <createTable tableName="aggregate_scheme_payments">
       <column name="id" type="INTEGER" autoIncrement="true">
         <constraints nullable="false" primaryKey="true" primaryKeyName="asp_id_pkey" />
