@@ -171,10 +171,8 @@ docker run -e PORT=3001 -p 3001:3001 fcp-mpdp-backend
 
 A local environment with:
 
-- Localstack for AWS services (S3, SQS)
-- Redis
 - This service.
-- A commented out frontend example.
+- Postgres database.
 
 ```bash
 npm run docker:dev
