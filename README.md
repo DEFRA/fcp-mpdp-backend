@@ -175,10 +175,17 @@ A local environment with:
 - Redis
 - This service.
 - A commented out frontend example.
+  To build the Docker container:
 
 ```bash
-npm run docker:dev
+npm run docker:build # docker compose build
 ```
+
+```bash
+npm run docker:dev # docker compose up
+```
+
+The Docker container can be stopped using any value `docker compose down` argument.
 
 ### Dependabot
 

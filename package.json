@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "NODE_ENV=development npm run server:watch",
     "dev:debug": "NODE_ENV=development npm run server:debug",
+    "docker:build": "docker compose build",
     "docker:dev": "docker compose up",
     "format": "prettier --write \"**/*.{cjs,js,json,md}\"",
     "format:check": "prettier --check \"**/*.{cjs,js,json,md}\"",
@@ -23,7 +24,7 @@
     "start": "NODE_ENV=production node --use-strict .",
     "test": "TZ=UTC vitest run --coverage",
     "test:watch": "TZ=UTC vitest",
-    "docker:test": "docker compose down -v && docker compose -f compose.yml -f compose.test.yml run --build --rm 'fcp-mpdp-backend'",
+    "docker:test": "docker compose -f compose.yml -f compose.test.yml run --build --rm 'fcp-mpdp-backend'",
     "docker:test:watch": "docker compose down -v && docker compose -f compose.yml -f compose.test.yml -f compose.test.watch.yml run --build --rm 'fcp-mpdp-backend'"
   },
   "author": "Defra DDTS",
