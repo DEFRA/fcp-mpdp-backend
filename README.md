@@ -174,9 +174,19 @@ A local environment with:
 - This service.
 - Postgres database.
 
+To build the Docker container:
+
 ```bash
-npm run docker:dev
+npm run docker:build # docker compose build
 ```
+
+To run the Docker container:
+
+```bash
+npm run docker:dev # docker compose up
+```
+
+The Docker container can be stopped using any valid `docker compose down` argument.
 
 ### Dependabot
 
