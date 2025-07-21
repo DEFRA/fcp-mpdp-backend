@@ -182,6 +182,8 @@ To build the Docker container:
 npm run docker:build # docker compose build
 ```
 
+To run the Docker container:
+
 ```bash
 npm run docker:dev # docker compose up
 ```
