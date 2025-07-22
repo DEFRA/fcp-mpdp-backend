@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { getTrustStoreCerts } from '../../../../../src/common/helpers/secure-context/get-trust-store-certs.js'
 
-describe('#getTrustStoreCerts', () => {
+describe('getTrustStoreCerts', () => {
   const mockProcessEnvWithCerts = {
     TRUSTSTORE_CA_ONE:
       'LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCm1vY2stY2VydC1kb3JpcwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==',

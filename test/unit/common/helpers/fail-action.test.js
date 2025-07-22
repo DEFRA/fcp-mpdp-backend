@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { failAction } from '../../../../src/common/helpers/fail-action.js'
 
-describe('#fail-action', () => {
+describe('fail-action', () => {
   test('Should throw expected error', () => {
     const mockRequest = {}
     const mockToolkit = {}

@@ -29,14 +29,14 @@ jobs:
 
       # Ensure tests pass. Add more checks if required
       - run: npm ci
-      - run: npm test
+      - run: npm run docker:test
 
       - name: Publish Hot Fix
         uses: DEFRA/cdp-build-action/build-hotfix@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: npm install && npm test
+      - run: npm install && npm run docker:test
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

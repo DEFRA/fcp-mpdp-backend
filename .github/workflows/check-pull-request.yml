@@ -27,7 +27,7 @@ jobs:
       - run: |
           npm ci
           npm run lint
-          npm test
+          npm run docker:test
 
       - name: Test Docker Image Build
         run: |

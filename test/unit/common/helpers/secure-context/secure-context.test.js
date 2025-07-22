@@ -32,7 +32,7 @@ vi.mock('node:tls', async () => {
   }
 })
 
-describe('#secureContext', () => {
+describe('secureContext', () => {
   let server
 
   describe('When secure context is disabled', () => {

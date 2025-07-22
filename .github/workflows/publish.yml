@@ -31,7 +31,7 @@ jobs:
       - name: Create Test Coverage Reports
         run: |
           npm ci
-          npm test
+          npm run docker:test
 
       - name: Publish Database Schema
         uses: DEFRA/cdp-build-action/publish-db-migrations@main

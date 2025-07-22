@@ -35,7 +35,7 @@ vi.mock('../../../../src/data/database.js', () => {
   }
 })
 
-describe('#startServer', () => {
+describe('startServer', () => {
   const PROCESS_ENV = process.env
   let createServerSpy
   let hapiServerSpy
