@@ -18,17 +18,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Test code and Create Test Coverage Reports
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - name: Create coverage directory
+      
+      - name: Create Coverage Directory
         run: mkdir -p coverage
-      - run: |
-          npm ci
-          npm run lint
+
+      - name: Run Tests
+        run: |
           npm run docker:test
 
       - name: Test Docker Image Build

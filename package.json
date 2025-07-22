@@ -22,7 +22,7 @@
     "start": "NODE_ENV=production node --use-strict .",
     "test": "TZ=UTC vitest run --coverage",
     "test:watch": "TZ=UTC vitest",
-    "docker:test": "mkdir -p coverage 2>/dev/null || true && docker compose down -v && docker compose -f compose.yml -f compose.test.yml run --build --rm 'fcp-mpdp-backend'",
+    "docker:test": "npm run lint && mkdir -p coverage 2>/dev/null || true && docker compose down -v && docker compose -f compose.yml -f compose.test.yml run --build --rm 'fcp-mpdp-backend'",
     "docker:test:watch": "docker compose down -v && docker compose -f compose.yml -f compose.test.yml -f compose.test.watch.yml run --build --rm 'fcp-mpdp-backend'"
   },
   "author": "Defra DDTS",
