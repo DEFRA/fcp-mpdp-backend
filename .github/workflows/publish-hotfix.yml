@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0 # Depth 0 is required for branch-based versioning
 
       - name: Create Coverage Directory
-        run: mkdir -p -m 775 coverage
+        run: mkdir -p -m 777 coverage
 
       - name: Run Tests
         run: npm run docker:test
