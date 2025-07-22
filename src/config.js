@@ -104,7 +104,7 @@ const config = convict({
     host: {
       doc: 'Postgres host',
       format: String,
-      default: 'postgres',
+      default: null,
       env: 'POSTGRES_HOST'
     },
     hostReadOnly: {
@@ -153,7 +153,14 @@ const config = convict({
       doc: 'Sequelize dialect',
       format: String,
       default: 'postgres'
-    }
+    },
+    logging: {
+      doc: 'Enable Sequelize logging',
+      format: Boolean,
+      default: false,
+      env: 'POSTGRES_LOGGING'
+    },
+    
   }
 })
 

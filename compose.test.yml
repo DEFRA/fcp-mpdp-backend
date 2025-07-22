@@ -5,3 +5,8 @@ services:
     image: fcp-mpdp-backend-development
     container_name: fcp-mpdp-backend-test
     command: npm test
+    depends_on:
+      postgres:
+        condition: service_healthy
+      liquibase:
+        condition: service_started

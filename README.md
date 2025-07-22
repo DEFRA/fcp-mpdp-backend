@@ -11,10 +11,9 @@ MPDP is part of the Farming and Countryside Programme (FCP).
   - [Development](#development)
   - [Testing](#testing)
   - [Production](#production)
-  - [Npm scripts](#npm-scripts)
+  - [npm scripts](#npm-scripts)
   - [Update dependencies](#update-dependencies)
   - [Formatting](#formatting)
-    - [Windows prettier issue](#windows-prettier-issue)
 - [API endpoints](#api-endpoints)
 - [Development helpers](#development-helpers)
   - [Proxy](#proxy)
@@ -75,7 +74,7 @@ To mimic the application running in `production` mode locally run:
 npm start
 ```
 
-### Npm scripts
+### npm scripts
 
 All available Npm scripts can be seen in [package.json](./package.json).
 To view them in your command line run:
@@ -95,23 +94,20 @@ To update dependencies use [npm-check-updates](https://github.com/raineorshine/n
 ncu --interactive --format group
 ```
 
-### Formatting
-
-#### Windows prettier issue
-
-If you are having issues with formatting of line breaks on Windows update your global git config by running:
-
-```bash
-git config --global core.autocrlf false
-```
-
 ## API endpoints
 
-| Endpoint             | Description                    |
-| :------------------- | :----------------------------- |
-| `GET: /health`       | Health                         |
-| `GET: /example    `  | Example API (remove as needed) |
-| `GET: /example/<id>` | Example API (remove as needed) |
+| Endpoint                                               | Method | Description                                      |
+| :----------------------------------------------------- | :----- | :----------------------------------------------- |
+| `GET: /health`                                         | GET    | Health check endpoint                            |
+| `POST: /v1/payments`                                   | POST   | Search for payment data with filters             |
+| `POST: /v1/payments/file`                              | POST   | Download payment search results as CSV          |
+| `GET: /v1/payments/file`                               | GET    | Download all payments as CSV stream              |
+| `GET: /v1/payments/search`                             | GET    | Get search suggestions for payee names          |
+| `GET: /v1/payments/summary`                            | GET    | Get payment summary by scheme and year          |
+| `GET: /v1/payments/summary/file`                       | GET    | Download payment summary as CSV                  |
+| `GET: /v1/payments/{payeeName}/{partPostcode}`         | GET    | Get specific payee payment details              |
+| `GET: /v1/payments/{payeeName}/{partPostcode}/file`    | GET    | Download specific payee payment details as CSV  |
+
 
 ## Development helpers
 

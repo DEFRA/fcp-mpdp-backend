@@ -1,5 +1,5 @@
 services:
-  development:
+  fcp-mpdp-backend:
     container_name: fcp-mpdp-backend-development
     build:
       context: .

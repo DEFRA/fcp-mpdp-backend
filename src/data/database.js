@@ -35,6 +35,9 @@ async function register(server, options) {
       max: 10,
       name: 'connection',
       timeout: 60 * 1000
+    },
+    define: {
+      timestamps: false
     }
   })
 

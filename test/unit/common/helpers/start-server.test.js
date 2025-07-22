@@ -18,12 +18,22 @@ vi.mock('hapi-pino', () => ({
     name: 'mock-hapi-pino'
   }
 }))
+
 vi.mock('../../../../src/common/helpers/logging/logger.js', () => ({
   createLogger: () => ({
     info: (...args) => mockLoggerInfo(...args),
     error: (...args) => mockLoggerError(...args)
   })
 }))
+
+vi.mock('../../../../src/data/database.js', () => {
+  const mockSequelize = {
+    authenticate: vi.fn().mockResolvedValue()
+  }
+  return {
+    register: vi.fn(() => mockSequelize)
+  }
+})
 
 describe('#startServer', () => {
   const PROCESS_ENV = process.env
@@ -67,10 +77,18 @@ describe('#startServer', () => {
       )
       expect(mockHapiLoggerInfo).toHaveBeenNthCalledWith(
         2,
-        'Server started successfully'
+        'Setting up Postgres'
       )
       expect(mockHapiLoggerInfo).toHaveBeenNthCalledWith(
         3,
+        'Postgres connected to fcp_mpdp_backend'
+      )
+      expect(mockHapiLoggerInfo).toHaveBeenNthCalledWith(
+        4,
+        'Server started successfully'
+      )
+      expect(mockHapiLoggerInfo).toHaveBeenNthCalledWith(
+        5,
         'Access your backend on http://localhost:3098'
       )
     })

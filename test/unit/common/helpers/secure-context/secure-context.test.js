@@ -1,4 +1,4 @@
-import hapi from '@hapi/hapi'
+import Hapi from '@hapi/hapi'
 import { secureContext } from '../../../../../src/common/helpers/secure-context/index.js'
 import { requestLogger } from '../../../../../src/common/helpers/logging/request-logger.js'
 import { config } from '../../../../../src/config.js'
@@ -37,7 +37,7 @@ describe('#secureContext', () => {
   describe('When secure context is disabled', () => {
     beforeEach(async () => {
       config.set('isSecureContextEnabled', false)
-      server = hapi.server()
+      server = Hapi.server()
       await server.register([requestLogger, secureContext])
     })
 
@@ -67,7 +67,7 @@ describe('#secureContext', () => {
 
     beforeEach(async () => {
       config.set('isSecureContextEnabled', true)
-      server = hapi.server()
+      server = Hapi.server()
       await server.register([requestLogger, secureContext])
     })
 
@@ -98,7 +98,7 @@ describe('#secureContext', () => {
   describe('When secure context is enabled without TRUSTSTORE_ certs', () => {
     beforeEach(async () => {
       config.set('isSecureContextEnabled', true)
-      server = hapi.server()
+      server = Hapi.server()
       await server.register([requestLogger, secureContext])
     })
 
