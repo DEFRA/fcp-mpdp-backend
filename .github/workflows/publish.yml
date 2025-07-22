@@ -30,6 +30,7 @@ jobs:
 
       - name: Create Test Coverage Reports
         run: |
+          mkdir -p coverage
           npm ci
           npm run docker:test
 

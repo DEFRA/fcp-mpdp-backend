@@ -24,6 +24,8 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - name: Create coverage directory
+        run: mkdir -p coverage
       - run: |
           npm ci
           npm run lint
