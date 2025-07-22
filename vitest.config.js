@@ -10,7 +10,8 @@ export default defineConfig({
       reportsDirectory: './coverage',
       reporter: ['text', 'lcov'],
       include: ['src/**'],
-      exclude: [...configDefaults.exclude, 'coverage', '**/test/**']
+      exclude: [...configDefaults.exclude, 'coverage', '**/test/**'],
+      clean: false
     }
   }
 })
