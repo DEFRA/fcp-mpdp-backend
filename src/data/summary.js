@@ -1,12 +1,12 @@
 import { AsyncParser } from '@json2csv/node'
 import { getAnnualPayments } from '../data/database.js'
 
-async function getPaymentSummary() {
+async function getPaymentSummary () {
   const payments = await getAnnualPayments()
   return groupPaymentsByYear(payments)
 }
 
-async function getPaymentSummaryCsv() {
+async function getPaymentSummaryCsv () {
   const fields = [
     'financial_year',
     'scheme',
@@ -24,7 +24,7 @@ async function getPaymentSummaryCsv() {
   return parser.parse(sortedPayments).promise()
 }
 
-function groupPaymentsByYear(payments) {
+function groupPaymentsByYear (payments) {
   return payments.reduce((acc, item) => {
     if (!acc[item.financial_year]) {
       acc[item.financial_year] = []

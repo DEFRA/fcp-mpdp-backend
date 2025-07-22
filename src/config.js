@@ -160,7 +160,7 @@ const config = convict({
       default: false,
       env: 'POSTGRES_LOGGING'
     },
-    
+
   }
 })
 

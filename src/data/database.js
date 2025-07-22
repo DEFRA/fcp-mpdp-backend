@@ -7,7 +7,7 @@ let SchemePaymentsModel
 let PaymentDataModel
 let PaymentDetailModel
 
-async function register(server, options) {
+async function register (server, options) {
   if (options.getTokenFromRDS) {
     options.hooks = {
       beforeConnect: async (config) => {
@@ -46,7 +46,7 @@ async function register(server, options) {
   return sequelize
 }
 
-async function getToken(options) {
+async function getToken (options) {
   const signer = new Signer({
     hostname: options.host,
     port: options.port,
@@ -54,10 +54,10 @@ async function getToken(options) {
     credentials: fromNodeProviderChain(),
     region: options.region
   })
-  return await signer.getAuthToken()
+  return signer.getAuthToken()
 }
 
-function defineModels() {
+function defineModels () {
   SchemePaymentsModel = sequelize.define('aggregate_scheme_payments', {
     id: { type: DataTypes.INTEGER, primaryKey: true },
     financial_year: DataTypes.STRING(8),
@@ -87,18 +87,18 @@ function defineModels() {
   })
 }
 
-async function healthCheck() {
+async function healthCheck () {
   await sequelize.authenticate()
 }
 
-async function getAnnualPayments() {
+async function getAnnualPayments () {
   return SchemePaymentsModel.findAll({
     attributes: ['scheme', 'financial_year', 'total_amount'],
     raw: true
   })
 }
 
-async function getPayeePayments(payeeName, partPostcode) {
+async function getPayeePayments (payeeName, partPostcode) {
   return PaymentDetailModel.findAll({
     group: [
       'financial_year',
@@ -128,7 +128,7 @@ async function getPayeePayments(payeeName, partPostcode) {
   })
 }
 
-async function getAllPayments() {
+async function getAllPayments () {
   const payments = await PaymentDataModel.findAll({
     group: [
       'payee_name',
@@ -152,7 +152,7 @@ async function getAllPayments() {
   return payments
 }
 
-async function getAllPaymentsByPage(page = 1, pageSize = 250) {
+async function getAllPaymentsByPage (page = 1, pageSize = 250) {
   return PaymentDataModel.findAll({
     group: [
       'payee_name',

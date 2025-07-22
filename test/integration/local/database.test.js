@@ -17,7 +17,7 @@ describe('database', () => {
     vi.clearAllMocks()
     server = await createServer()
     await server.initialize()
-    
+
     await PaymentDetailModel.truncate()
     await PaymentDetailModel.bulkCreate([
       { id: 1, payee_name: 'payee name 1', part_postcode: 'pp1', town: 'town', county_council: 'county council', financial_year: '20/21', parliamentary_constituency: 'parliamentary constituency', scheme: 'scheme 1', scheme_detail: 'scheme detail 1', amount: 100 },

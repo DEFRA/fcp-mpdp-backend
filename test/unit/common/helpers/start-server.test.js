@@ -102,7 +102,7 @@ describe('#startServer', () => {
     test('Should log failed startup message', async () => {
       await startServerImport.startServer()
 
-      expect(mockLoggerInfo).toHaveBeenCalledWith('Server failed to start :(')
+      expect(mockLoggerInfo).toHaveBeenCalledWith('Server failed to start')
       expect(mockLoggerError).toHaveBeenCalledWith(
         Error('Server failed to start')
       )

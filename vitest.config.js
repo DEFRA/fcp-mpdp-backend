@@ -11,7 +11,6 @@ export default defineConfig({
       reporter: ['text', 'lcov'],
       include: ['src/**'],
       exclude: [...configDefaults.exclude, 'coverage', '**/test/**']
-    },
-    setupFiles: ['.vite/setup-files.js']
+    }
   }
 })

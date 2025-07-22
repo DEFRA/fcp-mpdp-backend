@@ -1,4 +1,4 @@
-function applyFiltersAndGroupByPayee(
+function applyFiltersAndGroupByPayee (
   searchResults,
   { schemes = [], counties = [], amounts = [], years = [] }
 ) {
@@ -13,7 +13,7 @@ function applyFiltersAndGroupByPayee(
   return amountFilteredResults.map((result) => removeKeys(result, ['scheme']))
 }
 
-function filterBySchemes(searchResults, schemes) {
+function filterBySchemes (searchResults, schemes) {
   if (!schemes.length) {
     return searchResults
   }
@@ -22,7 +22,7 @@ function filterBySchemes(searchResults, schemes) {
   )
 }
 
-function filterByCounties(searchResults, counties) {
+function filterByCounties (searchResults, counties) {
   if (!counties.length) {
     return searchResults
   }
@@ -31,7 +31,7 @@ function filterByCounties(searchResults, counties) {
   )
 }
 
-function filterByYears(results, years) {
+function filterByYears (results, years) {
   if (!years.length) {
     return results
   }
@@ -39,7 +39,7 @@ function filterByYears(results, years) {
   return results.filter((x) => years.includes(x.financial_year))
 }
 
-function groupByPayee(searchResults) {
+function groupByPayee (searchResults) {
   const result = searchResults.reduce((acc, item) => {
     const payee = acc.find(
       (r) =>
@@ -60,7 +60,7 @@ function groupByPayee(searchResults) {
   return result
 }
 
-function filterByAmounts(searchResults, amounts) {
+function filterByAmounts (searchResults, amounts) {
   if (!amounts.length) {
     return searchResults
   }
@@ -79,7 +79,7 @@ function filterByAmounts(searchResults, amounts) {
   })
 }
 
-function getFilterOptions(searchResults) {
+function getFilterOptions (searchResults) {
   if (!searchResults.length) {
     return { schemes: [], amounts: [], counties: [], years: [] }
   }
@@ -92,7 +92,7 @@ function getFilterOptions(searchResults) {
   }
 }
 
-function getUniqueFields(searchResults, field) {
+function getUniqueFields (searchResults, field) {
   try {
     return searchResults.reduce((acc, result) => {
       if (
@@ -113,7 +113,7 @@ function getUniqueFields(searchResults, field) {
   }
 }
 
-function removeKeys(obj, keys) {
+function removeKeys (obj, keys) {
   return Object.fromEntries(
     Object.entries(obj).filter(([key]) => !keys.includes(key))
   )

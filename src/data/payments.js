@@ -3,7 +3,7 @@ import { AsyncParser } from '@json2csv/node'
 import { getAllPaymentsByPage } from './database.js'
 import { getPaymentData } from './search.js'
 
-async function getPaymentsCsv({
+async function getPaymentsCsv ({
   searchString,
   limit,
   offset,
@@ -34,7 +34,7 @@ async function getPaymentsCsv({
   return parser.parse(paymentsWithAmounts).promise()
 }
 
-function getAllPaymentsCsvStream() {
+function getAllPaymentsCsvStream () {
   const fields = [
     'financial_year',
     'payee_name',
@@ -53,7 +53,7 @@ function getAllPaymentsCsvStream() {
   let page = 1
 
   const paymentStream = new Readable({
-    read(_size) {
+    read (_size) {
       getAllPaymentsByPage(page)
         .then((payments) => {
           if (payments.length === 0) {
@@ -85,7 +85,7 @@ function getAllPaymentsCsvStream() {
   return paymentStream
 }
 
-function getReadableAmount(amount) {
+function getReadableAmount (amount) {
   const floatAmount = parseFloat(amount)
 
   if (isNaN(floatAmount)) {

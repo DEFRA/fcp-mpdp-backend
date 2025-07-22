@@ -1,3 +1,4 @@
+import { describe, test, expect, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest'
 import Hapi from '@hapi/hapi'
 import { secureContext } from '../../../../../src/common/helpers/secure-context/index.js'
 import { requestLogger } from '../../../../../src/common/helpers/logging/request-logger.js'

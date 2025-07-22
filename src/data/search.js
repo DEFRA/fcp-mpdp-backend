@@ -17,7 +17,7 @@ const options = {
 
 const suggestionResultsLimit = 6
 
-async function getPaymentData({
+async function getPaymentData ({
   searchString,
   limit,
   offset,
@@ -48,7 +48,7 @@ async function getPaymentData({
   }
 }
 
-async function getSearchSuggestions(searchString) {
+async function getSearchSuggestions (searchString) {
   const searchResults = await searchAllPayments(searchString)
   const groupedResults = groupByPayee(searchResults)
   return {
@@ -61,13 +61,13 @@ async function getSearchSuggestions(searchString) {
   }
 }
 
-async function searchAllPayments(searchString) {
+async function searchAllPayments (searchString) {
   const payments = await getAllPayments()
   const fuse = new Fuse(payments, options)
   return fuse.search(searchString).map((result) => result.item)
 }
 
-function sortResults(results, sortBy) {
+function sortResults (results, sortBy) {
   if (sortBy !== 'score' && options.keys.includes(sortBy)) {
     return results.sort((a, b) => (a[sortBy] > b[sortBy] ? 1 : -1))
   }

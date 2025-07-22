@@ -1,7 +1,7 @@
 import { AsyncParser } from '@json2csv/node'
 import { getPayeePayments } from './database.js'
 
-async function getPayeeDetails(payeeName, partPostcode) {
+async function getPayeeDetails (payeeName, partPostcode) {
   const payments = await getPayeePayments(payeeName, partPostcode)
 
   if (!payments.length) {
@@ -27,7 +27,7 @@ async function getPayeeDetails(payeeName, partPostcode) {
   }
 }
 
-async function getPayeeDetailsCsv(payeeName, partPostcode) {
+async function getPayeeDetailsCsv (payeeName, partPostcode) {
   const fields = [
     'financial_year',
     'payee_name',
