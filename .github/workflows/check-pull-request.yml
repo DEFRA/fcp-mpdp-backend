@@ -25,6 +25,12 @@ jobs:
       - name: Run Tests
         run: |
           npm run docker:test
+          
+      - name: Fix coverage paths for SonarCloud
+        run: |
+          if [ -f coverage/lcov.info ]; then
+            sed -i 's|/home/node/||g' coverage/lcov.info
+          fi
 
       - name: Test Docker Image Build
         run: |
