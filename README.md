@@ -16,7 +16,6 @@ MPDP is part of the Farming and Countryside Programme (FCP).
   - [Setup](#setup)
   - [Development](#development)
   - [Testing](#testing)
-  - [Production](#production)
   - [npm scripts](#npm-scripts)
   - [Update dependencies](#update-dependencies)
 - [API endpoints](#api-endpoints)
