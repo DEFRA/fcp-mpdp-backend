@@ -3,6 +3,7 @@ import Joi from 'joi'
 
 import { config } from './config.js'
 import { router } from './plugins/router.js'
+import { swagger } from './plugins/swagger.js'
 import { requestLogger } from './common/helpers/logging/request-logger.js'
 import { failAction } from './common/helpers/fail-action.js'
 import { secureContext } from './common/helpers/secure-context/index.js'
@@ -46,6 +47,8 @@ async function createServer () {
   // requestTracing - trace header logging and propagation
   // secureContext  - loads CA certificates from environment config
   // pulse          - provides shutdown handlers
+  // postgres       - database connection
+  // swagger        - API documentation
   // router         - routes used in the app
   await server.register([
     requestLogger,
@@ -53,6 +56,7 @@ async function createServer () {
     secureContext,
     pulse,
     postgres,
+    ...swagger,
     router
   ])
 
