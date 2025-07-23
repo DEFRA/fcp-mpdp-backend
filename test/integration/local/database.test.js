@@ -1,8 +1,6 @@
 import { describe, test, beforeEach, afterEach, vi, expect } from 'vitest'
 import {
-  SchemePaymentsModel,
-  PaymentDataModel,
-  PaymentDetailModel,
+  models,
   getAnnualPayments,
   getPayeePayments,
   getAllPayments,
@@ -18,8 +16,8 @@ describe('database', () => {
     server = await createServer()
     await server.initialize()
 
-    await PaymentDetailModel.truncate()
-    await PaymentDetailModel.bulkCreate([
+    await models.PaymentDetail.truncate()
+    await models.PaymentDetail.bulkCreate([
       { id: 1, payee_name: 'payee name 1', part_postcode: 'pp1', town: 'town', county_council: 'county council', financial_year: '20/21', parliamentary_constituency: 'parliamentary constituency', scheme: 'scheme 1', scheme_detail: 'scheme detail 1', amount: 100 },
       { id: 2, payee_name: 'payee name 1', part_postcode: 'pp1', town: 'town', county_council: 'county council', financial_year: '20/21', parliamentary_constituency: 'parliamentary constituency', scheme: 'scheme 1', scheme_detail: 'scheme detail 1', amount: 100 },
       { id: 3, payee_name: 'payee name 1', part_postcode: 'pp1', town: 'town', county_council: 'county council', financial_year: '20/21', parliamentary_constituency: 'parliamentary constituency', scheme: 'scheme 2', scheme_detail: 'scheme detail 1', amount: 100 },
@@ -31,46 +29,46 @@ describe('database', () => {
     await server.stop()
   })
 
-  describe('SchemePaymentsModel', () => {
+  describe('SchemePayments', () => {
     test('should return a sequelize model for aggregate_scheme_payments table', () => {
-      expect(SchemePaymentsModel).toBeInstanceOf(Function)
-      expect(SchemePaymentsModel.name).toBe('aggregate_scheme_payments')
+      expect(models.SchemePayments).toBeInstanceOf(Function)
+      expect(models.SchemePayments.name).toBe('aggregate_scheme_payments')
     })
 
     test('should include id, financial_year, scheme and total_amount fields', () => {
-      const fields = Object.keys(SchemePaymentsModel.tableAttributes)
+      const fields = Object.keys(models.SchemePayments.tableAttributes)
       expect(fields).toEqual(['id', 'financial_year', 'scheme', 'total_amount'])
     })
   })
 
-  describe('PaymentDataModel', () => {
+  describe('PaymentData', () => {
     test('should return a sequelize model for payment_activity_data table', () => {
-      expect(PaymentDataModel).toBeInstanceOf(Function)
-      expect(PaymentDataModel.name).toBe('payment_activity_data')
+      expect(models.PaymentData).toBeInstanceOf(Function)
+      expect(models.PaymentData.name).toBe('payment_activity_data')
     })
 
     test('should include id, payee_name, part_postcode, town, county_council and amount fields', () => {
-      const fields = Object.keys(PaymentDataModel.tableAttributes)
+      const fields = Object.keys(models.PaymentData.tableAttributes)
       expect(fields).toEqual(['id', 'payee_name', 'part_postcode', 'town', 'county_council', 'amount'])
     })
   })
 
-  describe('PaymentDetailModel', () => {
+  describe('PaymentDetail', () => {
     test('should return a sequelize model for payment_activity_data table', () => {
-      expect(PaymentDetailModel).toBeInstanceOf(Function)
-      expect(PaymentDetailModel.name).toBe('payment_activity_data')
+      expect(models.PaymentDetail).toBeInstanceOf(Function)
+      expect(models.PaymentDetail.name).toBe('payment_activity_data')
     })
 
     test('should include id, payee_name, part_postcode, town, county_council, financial_year, parliamentary_constituency, scheme, scheme_detail and amount fields', () => {
-      const fields = Object.keys(PaymentDetailModel.tableAttributes)
+      const fields = Object.keys(models.PaymentDetail.tableAttributes)
       expect(fields).toEqual(['id', 'payee_name', 'part_postcode', 'town', 'county_council', 'financial_year', 'parliamentary_constituency', 'scheme', 'scheme_detail', 'amount'])
     })
   })
 
   describe('getAnnualPayments', () => {
     beforeEach(async () => {
-      await SchemePaymentsModel.truncate()
-      await SchemePaymentsModel.bulkCreate([
+      await models.SchemePayments.truncate()
+      await models.SchemePayments.bulkCreate([
         { id: 1, scheme: 'scheme 1', financial_year: '20/21', total_amount: 100 },
         { id: 2, scheme: 'scheme 2', financial_year: '20/21', total_amount: 200 }
       ])
@@ -110,9 +108,9 @@ describe('database', () => {
 
   describe('getAllPayments', () => {
     test('should get all payments from database', async () => {
-      vi.spyOn(PaymentDataModel, 'findAll')
+      vi.spyOn(models.PaymentData, 'findAll')
       await getAllPayments()
-      expect(PaymentDataModel.findAll).toHaveBeenCalledTimes(1)
+      expect(models.PaymentData.findAll).toHaveBeenCalledTimes(1)
     })
 
     test('should group payments by payee and scheme', async () => {
@@ -168,7 +166,7 @@ describe('database', () => {
     })
 
     test('should order by payee_name', async () => {
-      await PaymentDataModel.create({ id: 5, payee_name: 'payee name 0', part_postcode: 'pp3', town: 'town', county_council: 'county council', financial_year: '20/21', scheme: 'scheme 1', scheme_detail: 'scheme detail 1', amount: 100 })
+      await models.PaymentData.create({ id: 5, payee_name: 'payee name 0', part_postcode: 'pp3', town: 'town', county_council: 'county council', financial_year: '20/21', scheme: 'scheme 1', scheme_detail: 'scheme detail 1', amount: 100 })
       const data = await getAllPaymentsByPage()
       expect(data[0].payee_name).toBe('payee name 0')
     })

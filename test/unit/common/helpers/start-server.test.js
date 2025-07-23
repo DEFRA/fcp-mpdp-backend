@@ -27,11 +27,9 @@ vi.mock('../../../../src/common/helpers/logging/logger.js', () => ({
 }))
 
 vi.mock('../../../../src/data/database.js', () => {
-  const mockSequelize = {
-    authenticate: vi.fn().mockResolvedValue()
-  }
   return {
-    register: vi.fn(() => mockSequelize)
+    createModels: vi.fn(),
+    healthCheck: vi.fn()
   }
 })
 

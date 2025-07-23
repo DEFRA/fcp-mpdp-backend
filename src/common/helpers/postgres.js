@@ -1,5 +1,8 @@
+import { Sequelize } from 'sequelize'
+import { Signer } from '@aws-sdk/rds-signer'
+import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import { config } from '../../config.js'
-import { register } from '../../data/database.js'
+import { healthCheck, createModels } from '../../data/database.js'
 
 export const postgres = {
   plugin: {
@@ -8,13 +11,56 @@ export const postgres = {
     register: async function (server, options) {
       server.logger.info('Setting up Postgres')
 
-      const sequelize = await register(server, options)
+      if (options.getTokenFromRDS) {
+        options.hooks = {
+          beforeConnect: async (cfg) => {
+            cfg.password = await getToken(options)
+          }
+        }
+      }
+
+      const sequelize = new Sequelize({
+        username: options.user,
+        password: options.passwordForLocalDev,
+        host: options.host,
+        port: options.port,
+        dialect: options.dialect,
+        database: options.database,
+        dialectOptions: {
+          ssl: server.secureContext || false
+        },
+        logging: (msg) => server.logger.info(msg),
+        hooks: options.hooks || {},
+        retry: {
+          backOffBase: 1000,
+          backOffExponent: 1.1,
+          match: [/SequelizeConnectionError/],
+          max: 10,
+          name: 'connection',
+          timeout: 60 * 1000
+        },
+        define: {
+          timestamps: false
+        }
+      })
       const databaseName = options.database
 
-      await sequelize.authenticate()
+      createModels(sequelize)
+      await healthCheck()
+
       server.logger.info(`Postgres connected to ${databaseName}`)
-      server.decorate('server', 'db', sequelize)
     }
   },
   options: config.get('postgres')
+}
+
+async function getToken (options) {
+  const signer = new Signer({
+    hostname: options.host,
+    port: options.port,
+    username: options.user,
+    credentials: fromNodeProviderChain(),
+    region: options.region
+  })
+  return signer.getAuthToken()
 }

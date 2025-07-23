@@ -1,11 +1,9 @@
 import { describe, test, beforeEach, afterEach, vi, expect } from 'vitest'
 
 vi.mock('../../../../src/data/database.js', () => {
-  const mockSequelize = {
-    authenticate: vi.fn().mockResolvedValue()
-  }
   return {
-    register: vi.fn(() => mockSequelize)
+    createModels: vi.fn(),
+    healthCheck: vi.fn()
   }
 })
 

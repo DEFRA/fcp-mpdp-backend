@@ -1,71 +1,19 @@
-import { Signer } from '@aws-sdk/rds-signer'
-import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
-import { Sequelize, DataTypes, where, fn, col, and } from 'sequelize'
+import { DataTypes, where, fn, col, and } from 'sequelize'
 
 let sequelize
-let SchemePaymentsModel
-let PaymentDataModel
-let PaymentDetailModel
+const models = {}
 
-async function register (server, options) {
-  if (options.getTokenFromRDS) {
-    options.hooks = {
-      beforeConnect: async (config) => {
-        config.password = await getToken(options)
-      }
-    }
-  }
+async function createModels (sequelizeInstance) {
+  sequelize = sequelizeInstance
 
-  sequelize = new Sequelize({
-    username: options.user,
-    password: options.passwordForLocalDev,
-    host: options.host,
-    port: options.port,
-    dialect: options.dialect,
-    database: options.database,
-    dialectOptions: {
-      ssl: server.secureContext || false
-    },
-    logging: (msg) => server.logger.info(msg),
-    hooks: options.hooks || {},
-    retry: {
-      backOffBase: 1000,
-      backOffExponent: 1.1,
-      match: [/SequelizeConnectionError/],
-      max: 10,
-      name: 'connection',
-      timeout: 60 * 1000
-    },
-    define: {
-      timestamps: false
-    }
-  })
-
-  defineModels()
-
-  return sequelize
-}
-
-async function getToken (options) {
-  const signer = new Signer({
-    hostname: options.host,
-    port: options.port,
-    username: options.user,
-    credentials: fromNodeProviderChain(),
-    region: options.region
-  })
-  return signer.getAuthToken()
-}
-
-function defineModels () {
-  SchemePaymentsModel = sequelize.define('aggregate_scheme_payments', {
+  models.SchemePayments = sequelize.define('aggregate_scheme_payments', {
     id: { type: DataTypes.INTEGER, primaryKey: true },
     financial_year: DataTypes.STRING(8),
     scheme: DataTypes.STRING(64),
     total_amount: DataTypes.DOUBLE
   })
 
-  PaymentDataModel = sequelize.define('payment_activity_data', {
+  models.PaymentData = sequelize.define('payment_activity_data', {
     payee_name: DataTypes.STRING(32),
     part_postcode: DataTypes.STRING(8),
     town: DataTypes.STRING(32),
@@ -73,7 +21,7 @@ function defineModels () {
     amount: DataTypes.DOUBLE
   })
 
-  PaymentDetailModel = sequelize.define('payment_activity_data', {
+  models.PaymentDetail = sequelize.define('payment_activity_data', {
     id: { type: DataTypes.INTEGER, primaryKey: true },
     payee_name: DataTypes.STRING(128),
     part_postcode: DataTypes.STRING(8),
@@ -92,14 +40,14 @@ async function healthCheck () {
 }
 
 async function getAnnualPayments () {
-  return SchemePaymentsModel.findAll({
+  return models.SchemePayments.findAll({
     attributes: ['scheme', 'financial_year', 'total_amount'],
     raw: true
   })
 }
 
 async function getPayeePayments (payeeName, partPostcode) {
-  return PaymentDetailModel.findAll({
+  return models.PaymentDetail.findAll({
     group: [
       'financial_year',
       'payee_name',
@@ -129,7 +77,7 @@ async function getPayeePayments (payeeName, partPostcode) {
 }
 
 async function getAllPayments () {
-  const payments = await PaymentDataModel.findAll({
+  const payments = await models.PaymentData.findAll({
     group: [
       'payee_name',
       'part_postcode',
@@ -153,7 +101,7 @@ async function getAllPayments () {
 }
 
 async function getAllPaymentsByPage (page = 1, pageSize = 250) {
-  return PaymentDataModel.findAll({
+  return models.PaymentData.findAll({
     group: [
       'payee_name',
       'part_postcode',
@@ -181,13 +129,11 @@ async function getAllPaymentsByPage (page = 1, pageSize = 250) {
 }
 
 export {
-  register,
-  SchemePaymentsModel,
-  PaymentDataModel,
-  PaymentDetailModel,
+  healthCheck,
+  createModels,
+  models,
   getAnnualPayments,
   getPayeePayments,
   getAllPayments,
-  getAllPaymentsByPage,
-  healthCheck
+  getAllPaymentsByPage
 }
