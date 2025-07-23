@@ -1,5 +1,5 @@
 import { describe, vi, beforeAll, afterAll, test, expect } from 'vitest'
-import hapi from '@hapi/hapi'
+import Hapi from '@hapi/hapi'
 
 const mockLoggerInfo = vi.fn()
 const mockLoggerError = vi.fn()
@@ -50,7 +50,7 @@ describe('startServer', () => {
     )
 
     createServerSpy = vi.spyOn(createServerImport, 'createServer')
-    hapiServerSpy = vi.spyOn(hapi, 'server')
+    hapiServerSpy = vi.spyOn(Hapi, 'server')
   })
 
   afterAll(() => {
