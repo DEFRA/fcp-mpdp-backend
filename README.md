@@ -1,3 +1,9 @@
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-mpdp-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-mpdp-backend)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-mpdp-backend&metric=bugs)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-mpdp-backend)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-mpdp-backend&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-mpdp-backend)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-mpdp-backend&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-mpdp-backend)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-mpdp-backend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-mpdp-backend)
+
 # fcp-mpdp-backend
 
 Backend API for the Making Payment Data Public (MPDP) service.
@@ -5,41 +11,28 @@ Backend API for the Making Payment Data Public (MPDP) service.
 MPDP is part of the Farming and Countryside Programme (FCP).
 
 - [Requirements](#requirements)
-  - [Node.js](#nodejs)
+  - [Docker](#docker)
 - [Local development](#local-development)
   - [Setup](#setup)
   - [Development](#development)
   - [Testing](#testing)
-  - [Production](#production)
-  - [Npm scripts](#npm-scripts)
+  - [npm scripts](#npm-scripts)
   - [Update dependencies](#update-dependencies)
-  - [Formatting](#formatting)
-    - [Windows prettier issue](#windows-prettier-issue)
 - [API endpoints](#api-endpoints)
-- [Development helpers](#development-helpers)
-  - [Proxy](#proxy)
-- [Docker](#docker)
-  - [Development image](#development-image)
-  - [Production image](#production-image)
-  - [Docker Compose](#docker-compose)
-  - [Dependabot](#dependabot)
-  - [SonarQube Cloud](#sonarqube-cloud)
+- [Dependabot](#dependabot)
+- [SonarQube Cloud](#sonarqube-cloud)
 - [Licence](#licence)
   - [About the licence](#about-the-licence)
 
 ## Requirements
 
-### Node.js
+### Docker
 
-Please install [Node.js](http://nodejs.org/) `>= v22` and [npm](https://nodejs.org/) `>= v11`. You will find it
-easier to use the Node Version Manager [nvm](https://github.com/creationix/nvm)
+This application is intended to be run in a Docker container to ensure consistency across environments.
 
-To use the correct version of Node.js for this application, via nvm:
+Docker can be installed from [Docker's official website](https://docs.docker.com/get-docker/).
 
-```bash
-cd fcp-mpdp-backend
-nvm use
-```
+> The test suite includes integration tests which are dependent on a Postgres container so cannot be run without Docker.
 
 ## Local development
 
@@ -56,7 +49,7 @@ npm install
 To run the application in `development` mode run:
 
 ```bash
-npm run dev
+npm run docker:dev
 ```
 
 ### Testing
@@ -64,20 +57,18 @@ npm run dev
 To test the application run:
 
 ```bash
-npm run test
+npm run docker:test
 ```
 
-### Production
-
-To mimic the application running in `production` mode locally run:
+Tests can also be run in watch mode to support Test Driven Development (TDD):
 
 ```bash
-npm start
+npm run docker:test:watch
 ```
 
-### Npm scripts
+### npm scripts
 
-All available Npm scripts can be seen in [package.json](./package.json).
+All available npm scripts can be seen in [package.json](./package.json).
 To view them in your command line run:
 
 ```bash
@@ -95,107 +86,30 @@ To update dependencies use [npm-check-updates](https://github.com/raineorshine/n
 ncu --interactive --format group
 ```
 
-### Formatting
-
-#### Windows prettier issue
-
-If you are having issues with formatting of line breaks on Windows update your global git config by running:
-
-```bash
-git config --global core.autocrlf false
-```
-
 ## API endpoints
 
-| Endpoint             | Description                    |
-| :------------------- | :----------------------------- |
-| `GET: /health`       | Health                         |
-| `GET: /example    `  | Example API (remove as needed) |
-| `GET: /example/<id>` | Example API (remove as needed) |
+| Endpoint                                               | Method | Description                                      |
+| :----------------------------------------------------- | :----- | :----------------------------------------------- |
+| `GET: /health`                                         | GET    | Health check endpoint                            |
+| `POST: /v1/payments`                                   | POST   | Search for payment data with filters             |
+| `POST: /v1/payments/file`                              | POST   | Download payment search results as CSV          |
+| `GET: /v1/payments/file`                               | GET    | Download all payments as CSV stream              |
+| `GET: /v1/payments/search`                             | GET    | Get search suggestions for payee names          |
+| `GET: /v1/payments/summary`                            | GET    | Get payment summary by scheme and year          |
+| `GET: /v1/payments/summary/file`                       | GET    | Download payment summary as CSV                  |
+| `GET: /v1/payments/{payeeName}/{partPostcode}`         | GET    | Get specific payee payment details              |
+| `GET: /v1/payments/{payeeName}/{partPostcode}/file`    | GET    | Download specific payee payment details as CSV  |
 
-## Development helpers
+All these endpoints are documented using [hapi-swagger](https://www.npmjs.com/package/hapi-swagger).
 
-### Proxy
+Documentation for the API can be found at [http://localhost:3001/documentation](http://localhost:3001/documentation) when running the application in development mode.
 
-We are using forward-proxy which is set up by default. To make use of this: `import { fetch } from 'undici'` then
-because of the `setGlobalDispatcher(new ProxyAgent(proxyUrl))` calls will use the ProxyAgent Dispatcher
-
-If you are not using Wreck, Axios or Undici or a similar http that uses `Request`. Then you may have to provide the
-proxy dispatcher:
-
-To add the dispatcher to your own client:
-
-```javascript
-import { ProxyAgent } from 'undici'
-
-return await fetch(url, {
-  dispatcher: new ProxyAgent({
-    uri: proxyUrl,
-    keepAliveTimeout: 10,
-    keepAliveMaxTimeout: 10
-  })
-})
-```
-
-## Docker
-
-### Development image
-
-Build:
-
-```bash
-docker build --target development --no-cache --tag fcp-mpdp-backend:development .
-```
-
-Run:
-
-```bash
-docker run -e PORT=3001 -p 3001:3001 fcp-mpdp-backend:development
-```
-
-### Production image
-
-Build:
-
-```bash
-docker build --no-cache --tag fcp-mpdp-backend .
-```
-
-Run:
-
-```bash
-docker run -e PORT=3001 -p 3001:3001 fcp-mpdp-backend
-```
-
-### Docker Compose
-
-A local environment with:
-
-- Localstack for AWS services (S3, SQS)
-- Redis
-- This service.
-- A commented out frontend example.
-
-To build the Docker container:
-
-```bash
-npm run docker:build # docker compose build
-```
-
-To run the Docker container:
-
-```bash
-npm run docker:dev # docker compose up
-```
-
-The Docker container can be stopped using any valid `docker compose down` argument.
-
-### Dependabot
+## Dependabot
 
 We have added an example dependabot configuration file to the repository. You can enable it by renaming
 the [.github/example.dependabot.yml](.github/example.dependabot.yml) to `.github/dependabot.yml`
 
-### SonarQube Cloud
+## SonarQube Cloud
 
 Instructions for setting up SonarQube Cloud can be found in [sonar-project.properties](./sonar-project.properties)
 

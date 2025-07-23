@@ -28,17 +28,18 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Test Coverage Reports
+      - name: Create Coverage Directory
+        run: mkdir -p -m 777 coverage
+
+      - name: Run Tests
         run: |
-          npm ci
-          npm test
+          npm run docker:test
 
       - name: Publish Database Schema
         uses: DEFRA/cdp-build-action/publish-db-migrations@main
         with:
           path: ./changelog
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          force: true
 
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarcloud-github-action@master

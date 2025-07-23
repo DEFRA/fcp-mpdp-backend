@@ -1,4 +1,5 @@
-import hapi from '@hapi/hapi'
+import { describe, vi, beforeAll, afterAll, test, expect } from 'vitest'
+import Hapi from '@hapi/hapi'
 
 const mockLoggerInfo = vi.fn()
 const mockLoggerError = vi.fn()
@@ -17,6 +18,7 @@ vi.mock('hapi-pino', () => ({
     name: 'mock-hapi-pino'
   }
 }))
+
 vi.mock('../../../../src/common/helpers/logging/logger.js', () => ({
   createLogger: () => ({
     info: (...args) => mockLoggerInfo(...args),
@@ -24,7 +26,14 @@ vi.mock('../../../../src/common/helpers/logging/logger.js', () => ({
   })
 }))
 
-describe('#startServer', () => {
+vi.mock('../../../../src/data/database.js', () => {
+  return {
+    createModels: vi.fn(),
+    healthCheck: vi.fn()
+  }
+})
+
+describe('startServer', () => {
   const PROCESS_ENV = process.env
   let createServerSpy
   let hapiServerSpy
@@ -41,7 +50,7 @@ describe('#startServer', () => {
     )
 
     createServerSpy = vi.spyOn(createServerImport, 'createServer')
-    hapiServerSpy = vi.spyOn(hapi, 'server')
+    hapiServerSpy = vi.spyOn(Hapi, 'server')
   })
 
   afterAll(() => {
@@ -66,10 +75,18 @@ describe('#startServer', () => {
       )
       expect(mockHapiLoggerInfo).toHaveBeenNthCalledWith(
         2,
-        'Server started successfully'
+        'Setting up Postgres'
       )
       expect(mockHapiLoggerInfo).toHaveBeenNthCalledWith(
         3,
+        'Postgres connected to fcp_mpdp_backend'
+      )
+      expect(mockHapiLoggerInfo).toHaveBeenNthCalledWith(
+        4,
+        'Server started successfully'
+      )
+      expect(mockHapiLoggerInfo).toHaveBeenNthCalledWith(
+        5,
         'Access your backend on http://localhost:3098'
       )
     })
@@ -83,7 +100,7 @@ describe('#startServer', () => {
     test('Should log failed startup message', async () => {
       await startServerImport.startServer()
 
-      expect(mockLoggerInfo).toHaveBeenCalledWith('Server failed to start :(')
+      expect(mockLoggerInfo).toHaveBeenCalledWith('Server failed to start')
       expect(mockLoggerError).toHaveBeenCalledWith(
         Error('Server failed to start')
       )

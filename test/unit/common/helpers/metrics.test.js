@@ -1,3 +1,4 @@
+import { describe, beforeEach, test, expect, vi } from 'vitest'
 import { StorageResolution, Unit } from 'aws-embedded-metrics'
 import { config } from '../../../../src/config.js'
 import { metricsCounter } from '../../../../src/common/helpers/metrics.js'
@@ -25,7 +26,7 @@ const mockMetricsName = 'mock-metrics-name'
 const defaultMetricsValue = 1
 const mockValue = 200
 
-describe('#metrics', () => {
+describe('metrics', () => {
   describe('When metrics is not enabled', () => {
     beforeEach(async () => {
       config.set('isMetricsEnabled', false)

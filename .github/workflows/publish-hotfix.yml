@@ -22,21 +22,17 @@ jobs:
         with:
           fetch-depth: 0 # Depth 0 is required for branch-based versioning
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
+      - name: Create Coverage Directory
+        run: mkdir -p -m 777 coverage
 
-      # Ensure tests pass. Add more checks if required
-      - run: npm ci
-      - run: npm test
+      - name: Run Tests
+        run: npm run docker:test
 
       - name: Publish Hot Fix
         uses: DEFRA/cdp-build-action/build-hotfix@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: npm install && npm test
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

@@ -1,5 +1,5 @@
 ARG PARENT_VERSION=2.8.5-node22.16.0
-ARG PORT=3000
+ARG PORT=3001
 ARG PORT_DEBUG=9229
 
 FROM defradigital/node-development:${PARENT_VERSION} AS development
@@ -11,7 +11,7 @@ ARG PORT_DEBUG
 ENV PORT=${PORT}
 EXPOSE ${PORT} ${PORT_DEBUG}
 
-COPY --chown=node:node package*.json ./
+COPY --chown=node:node package*.json .
 RUN npm install
 COPY --chown=node:node . .
 
@@ -27,7 +27,7 @@ USER root
 RUN apk add --no-cache curl
 USER node
 
-COPY --from=development /home/node/package*.json ./
+COPY --from=development /home/node/package*.json .
 COPY --from=development /home/node/src ./src/
 
 RUN npm ci --omit=dev
