@@ -100,6 +100,10 @@ ncu --interactive --format group
 | `GET: /v1/payments/{payeeName}/{partPostcode}`         | GET    | Get specific payee payment details              |
 | `GET: /v1/payments/{payeeName}/{partPostcode}/file`    | GET    | Download specific payee payment details as CSV  |
 
+All these endpoints are documented using [hapi-swagger](https://www.npmjs.com/package/hapi-swagger).
+
+Documentation for the API can be found at [http://localhost:3001/documentation](http://localhost:3001/documentation) when running the application in development mode.
+
 ## Dependabot
 
 We have added an example dependabot configuration file to the repository. You can enable it by renaming
