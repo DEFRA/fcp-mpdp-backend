@@ -69,6 +69,12 @@ describe('payee', () => {
         }
       ])
     })
+
+    test('should return undefined when no payments found', async () => {
+      getPayeePayments.mockResolvedValue([])
+      const data = await getPayeeDetails('non-existent payee', 'non-existent postcode')
+      expect(data).toBeUndefined()
+    })
   })
 
   describe('getPayeeDetailsCsv', () => {
