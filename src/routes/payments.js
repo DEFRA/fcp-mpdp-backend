@@ -25,8 +25,8 @@ const payments = [
           h.response(error.toString()).code(400).takeover()
       },
       handler: async (request, h) => {
-        const payments = await getPaymentData(request.payload)
-        return h.response(payments)
+        const paymentData = await getPaymentData(request.payload)
+        return h.response(paymentData)
       }
     }
   },
@@ -49,8 +49,8 @@ const payments = [
           h.response(error.toString()).code(400).takeover()
       },
       handler: async (request, h) => {
-        const payments = await getPaymentsCsv(request.payload)
-        return h.response(payments)
+        const paymentData = await getPaymentsCsv(request.payload)
+        return h.response(paymentData)
       }
     }
   },
