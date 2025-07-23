@@ -74,6 +74,86 @@ describe('search', () => {
       expect(data.rows.length).toBe(1)
       expect(data.rows[0].payee_name).toBe('payee name 2')
     })
+
+    test('should return empty results when no filtered results match', async () => {
+      // Mock a scenario where search finds no results at all
+      getAllPayments.mockResolvedValue([
+        { payee_name: 'completely different name', part_postcode: 'different postcode', town: 'different town', county_council: 'different council', scheme: 'scheme 1', financial_year: '20/21', total_amount: 100 }
+      ])
+
+      // Search for something that won't match
+      const data = await getPaymentData({
+        searchString: 'non-existent payee',
+        limit: 10,
+        offset: 0,
+        sortBy: 'score',
+        filterBy: {}
+      })
+
+      expect(data.count).toBe(0)
+      expect(data.rows).toEqual([])
+      expect(data.filterOptions).toBeInstanceOf(Object)
+    })
+
+    test('should sort results by payee_name when sortBy is payee_name', async () => {
+      const data = await getPaymentData({
+        searchString: 'payee name',
+        limit: 10,
+        offset: 0,
+        sortBy: 'payee_name',
+        filterBy: {}
+      })
+
+      expect(data.rows[0].payee_name).toBe('payee name 1')
+      expect(data.rows[1].payee_name).toBe('payee name 2')
+      expect(data.rows[2].payee_name).toBe('payee name 3')
+    })
+
+    test('should sort results by town when sortBy is town', async () => {
+      getAllPayments.mockResolvedValue([
+        { payee_name: 'test payee 1', part_postcode: 'part postcode', town: 'zebra town', county_council: 'county council', scheme: 'scheme 1', financial_year: '20/21', total_amount: 100 },
+        { payee_name: 'test payee 2', part_postcode: 'part postcode', town: 'alpha town', county_council: 'county council', scheme: 'scheme 1', financial_year: '20/21', total_amount: 200 },
+        { payee_name: 'test payee 3', part_postcode: 'part postcode', town: 'beta town', county_council: 'county council', scheme: 'scheme 1', financial_year: '20/21', total_amount: 300 }
+      ])
+
+      const data = await getPaymentData({
+        searchString: 'test payee',
+        limit: 10,
+        offset: 0,
+        sortBy: 'town',
+        filterBy: {}
+      })
+
+      expect(data.rows[0].town).toBe('alpha town')
+      expect(data.rows[1].town).toBe('beta town')
+      expect(data.rows[2].town).toBe('zebra town')
+    })
+
+    test('should not sort results when sortBy is score', async () => {
+      const data = await getPaymentData({
+        searchString: 'payee name',
+        limit: 10,
+        offset: 0,
+        sortBy: 'score',
+        filterBy: {}
+      })
+
+      expect(data.rows).toHaveLength(3)
+      expect(data.rows.map(r => r.payee_name)).toEqual(['payee name 1', 'payee name 2', 'payee name 3'])
+    })
+
+    test('should not sort results when sortBy is not a valid key', async () => {
+      const data = await getPaymentData({
+        searchString: 'payee name',
+        limit: 10,
+        offset: 0,
+        sortBy: 'invalid_field',
+        filterBy: {}
+      })
+
+      expect(data.rows).toHaveLength(3)
+      expect(data.rows.map(r => r.payee_name)).toEqual(['payee name 1', 'payee name 2', 'payee name 3'])
+    })
   })
 
   describe('getSearchSuggestions', () => {

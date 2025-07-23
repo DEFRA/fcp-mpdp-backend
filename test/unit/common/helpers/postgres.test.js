@@ -141,13 +141,11 @@ describe('postgres plugin', () => {
 
       await postgres.plugin.register(mockServer, mockOptions)
 
-      // Get the hooks object from the Sequelize call
       const sequelizeCallArgs = mockSequelize.mock.calls[0][0]
       const beforeConnectHook = sequelizeCallArgs.hooks.beforeConnect
 
       expect(beforeConnectHook).toBeInstanceOf(Function)
 
-      // Test the beforeConnect hook
       const mockConfig = { password: 'old-password' }
       await beforeConnectHook(mockConfig)
 
