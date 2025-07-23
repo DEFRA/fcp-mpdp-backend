@@ -1,0 +1,26 @@
+services:
+  fcp-mpdp-backend:
+    ports:
+      - '3001:3001'
+    networks:
+      - fcp-mpdp
+
+  postgres:
+    ports:
+      - '5432:5432'
+    networks:
+      - fcp-mpdp
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  liquibase:
+    networks:
+      - fcp-mpdp
+
+networks:
+  fcp-mpdp:
+    driver: bridge
+    name: fcp-mpdp
+
+volumes:
+  postgres_data:

@@ -1,11 +1,8 @@
 services:
   fcp-mpdp-backend:
-    container_name: fcp-mpdp-backend-development
     build:
       context: .
       target: development
-    ports:
-      - '3001:3001'
     depends_on:
       postgres:
         condition: service_healthy
@@ -22,20 +19,13 @@ services:
     volumes:
       - ./src:/home/node/src
       - ./package.json:/home/node/package.json
-    networks:
-      - fcp-mpdp
 
   postgres:
     image: postgres:16.6
-    container_name: fcp-mpdp-backend-postgres
-    ports:
-      - '5432:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: fcp_mpdp_backend
-    networks:
-      - fcp-mpdp
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 10s
@@ -45,17 +35,9 @@ services:
 
   liquibase:
     image: liquibase/liquibase
-    container_name: fcp-mpdp-backend-liquibase
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
       - ./changelog:/liquibase/changelog
     command: --url=jdbc:postgresql://postgres:5432/fcp_mpdp_backend --username=postgres --password=postgres --changelog-file=changelog/db.changelog.xml update
-    networks:
-      - fcp-mpdp
-
-networks:
-  fcp-mpdp:
-    driver: bridge
-    name: fcp-mpdp
