@@ -2,7 +2,6 @@ services:
   fcp-mpdp-backend:
     build:
       target: development
-    image: fcp-mpdp-backend-development
     command: npm test
     depends_on:
       postgres:

@@ -9,8 +9,6 @@ services:
       liquibase:
         condition: service_started
     environment:
-      PORT: 3001
-      NODE_ENV: development
       POSTGRES_HOST: postgres
       POSTGRES_HOST_READ: postgres
       POSTGRES_USER: postgres
