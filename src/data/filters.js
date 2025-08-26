@@ -107,8 +107,8 @@ function getUniqueFields (searchResults, field) {
       }
       return acc
     }, [])
-  } catch (error) {
-    console.error(error)
+  } catch (err) {
+    console.error(err)
     return []
   }
 }
