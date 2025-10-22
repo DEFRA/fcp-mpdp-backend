@@ -160,6 +160,24 @@ const config = convict({
       default: false,
       env: 'POSTGRES_LOGGING'
     },
+    poolMin: {
+      doc: 'Minimum connections in pool',
+      format: 'nat',
+      default: 1,
+      env: 'POSTGRES_POOL_MIN'
+    },
+    poolMax: {
+      doc: 'Maximum connections in pool',
+      format: 'nat',
+      default: 5,
+      env: 'POSTGRES_POOL_MAX'
+    },
+    poolIdle: {
+      doc: 'Connection idle timeout (ms)',
+      format: 'nat',
+      default: 840000,
+      env: 'POSTGRES_POOL_IDLE'
+    }
 
   }
 })

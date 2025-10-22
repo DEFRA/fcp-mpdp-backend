@@ -30,6 +30,9 @@ describe('config', () => {
     process.env.POSTGRES_DB = 'test-postgres-db'
     process.env.POSTGRES_GET_TOKEN_FROM_RDS = 'false'
     process.env.POSTGRES_REGION = 'us-west-2'
+    process.env.POSTGRES_POOL_MIN = '2'
+    process.env.POSTGRES_POOL_MAX = '10'
+    process.env.POSTGRES_POOL_IDLE = '900000'
   })
 
   afterAll(() => {
@@ -276,5 +279,38 @@ describe('config', () => {
   test('should return postgres dialect as postgres', async () => {
     const { config } = await import('../../src/config.js')
     expect(config.get('postgres.dialect')).toBe('postgres')
+  })
+
+  test('should return postgres pool min from environment variable', async () => {
+    const { config } = await import('../../src/config.js')
+    expect(config.get('postgres.poolMin')).toBe(2)
+  })
+
+  test('should default postgres pool min to 1 if not provided in environment variable', async () => {
+    delete process.env.POSTGRES_POOL_MIN
+    const { config } = await import('../../src/config.js')
+    expect(config.get('postgres.poolMin')).toBe(1)
+  })
+
+  test('should return postgres pool max from environment variable', async () => {
+    const { config } = await import('../../src/config.js')
+    expect(config.get('postgres.poolMax')).toBe(10)
+  })
+
+  test('should default postgres pool max to 5 if not provided in environment variable', async () => {
+    delete process.env.POSTGRES_POOL_MAX
+    const { config } = await import('../../src/config.js')
+    expect(config.get('postgres.poolMax')).toBe(5)
+  })
+
+  test('should return postgres pool idle from environment variable', async () => {
+    const { config } = await import('../../src/config.js')
+    expect(config.get('postgres.poolIdle')).toBe(900000)
+  })
+
+  test('should default postgres pool idle to 840000 if not provided in environment variable', async () => {
+    delete process.env.POSTGRES_POOL_IDLE
+    const { config } = await import('../../src/config.js')
+    expect(config.get('postgres.poolIdle')).toBe(840000)
   })
 })
