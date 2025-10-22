@@ -45,7 +45,10 @@ describe('postgres plugin', () => {
       user: 'test-user',
       passwordForLocalDev: 'test-password',
       dialect: 'postgres',
-      getTokenFromRDS: false
+      getTokenFromRDS: false,
+      poolMin: 1,
+      poolMax: 5,
+      poolIdle: 840000
     }
 
     mockSequelize.mockReturnValue({
@@ -69,8 +72,17 @@ describe('postgres plugin', () => {
         port: mockOptions.port,
         dialect: mockOptions.dialect,
         database: mockOptions.database,
+        pool: {
+          max: mockOptions.poolMax,
+          min: mockOptions.poolMin,
+          idle: mockOptions.poolIdle,
+          acquire: 30000,
+          evict: 60000
+        },
         dialectOptions: {
-          ssl: false
+          ssl: false,
+          keepAlive: true,
+          keepAliveInitialDelayMillis: 0
         },
         logging: expect.any(Function),
         hooks: {},
@@ -101,8 +113,17 @@ describe('postgres plugin', () => {
         port: mockOptions.port,
         dialect: mockOptions.dialect,
         database: mockOptions.database,
+        pool: {
+          max: mockOptions.poolMax,
+          min: mockOptions.poolMin,
+          idle: mockOptions.poolIdle,
+          acquire: 30000,
+          evict: 60000
+        },
         dialectOptions: {
-          ssl: true
+          ssl: true,
+          keepAlive: true,
+          keepAliveInitialDelayMillis: 0
         },
         logging: expect.any(Function),
         hooks: {

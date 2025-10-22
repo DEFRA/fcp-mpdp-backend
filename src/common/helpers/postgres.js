@@ -26,8 +26,17 @@ export const postgres = {
         port: options.port,
         dialect: options.dialect,
         database: options.database,
+        pool: {
+          max: options.poolMax,
+          min: options.poolMin,
+          idle: options.poolIdle,
+          acquire: 30000,
+          evict: 60000
+        },
         dialectOptions: {
-          ssl: server.secureContext || false
+          ssl: server.secureContext || false,
+          keepAlive: true,
+          keepAliveInitialDelayMillis: 0
         },
         logging: (msg) => server.logger.info(msg),
         hooks: options.hooks || {},
