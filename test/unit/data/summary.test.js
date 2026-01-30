@@ -21,7 +21,7 @@ describe('summary', () => {
       expect(data).toBeInstanceOf(Object)
     })
 
-    test('should group payments by year', async () => {
+    test('should group payments by year sorted by financial year', async () => {
       const data = await getPaymentSummary()
       expect(data).toEqual({
         '20/21': [
