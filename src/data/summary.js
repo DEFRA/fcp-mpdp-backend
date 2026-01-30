@@ -3,7 +3,8 @@ import { getAnnualPayments } from '../data/database.js'
 
 async function getPaymentSummary () {
   const payments = await getAnnualPayments()
-  return groupPaymentsByYear(payments)
+  const sortedPayments = sortByFinancialYear(payments)
+  return groupPaymentsByYear(sortedPayments)
 }
 
 async function getPaymentSummaryCsv () {
@@ -16,12 +17,16 @@ async function getPaymentSummaryCsv () {
     }
   ]
   const payments = await getAnnualPayments()
-  const sortedPayments = payments.toSorted((a, b) =>
-    a.financial_year > b.financial_year ? 1 : -1
-  )
+  const sortedPayments = sortByFinancialYear(payments)
 
   const parser = new AsyncParser({ fields })
   return parser.parse(sortedPayments).promise()
+}
+
+function sortByFinancialYear (payments) {
+  return payments.toSorted((a, b) =>
+    a.financial_year.localeCompare(b.financial_year)
+  )
 }
 
 function groupPaymentsByYear (payments) {
