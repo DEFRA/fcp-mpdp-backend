@@ -43,6 +43,7 @@
     "aws-embedded-metrics": "4.2.0",
     "convict": "6.2.4",
     "convict-format-with-validator": "6.2.0",
+    "csv-parser": "3.0.0",
     "fuse.js": "7.1.0",
     "global-agent": "3.0.0",
     "hapi-pino": "13.0.0",
