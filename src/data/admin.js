@@ -81,14 +81,17 @@ async function getAllPaymentsForAdmin (page = 1, limit = 20) {
 
 async function searchPaymentsForAdmin (searchString, page = 1, limit = 20) {
   const offset = (page - 1) * limit
-  const searchPattern = `%${searchString}%`
+
+  const whereClause = searchString
+    ? {
+        payee_name: {
+          [models.PaymentDetail.sequelize.Sequelize.Op.iLike]: `%${searchString}%`
+        }
+      }
+    : {}
 
   const { count, rows } = await models.PaymentDetail.findAndCountAll({
-    where: {
-      payee_name: {
-        [models.PaymentDetail.sequelize.Sequelize.Op.iLike]: searchPattern
-      }
-    },
+    where: whereClause,
     limit,
     offset,
     order: [['id', 'DESC']],

@@ -22,7 +22,7 @@ async function createModels (sequelizeInstance) {
   })
 
   models.PaymentDetail = sequelize.define('payment_activity_data', {
-    id: { type: DataTypes.INTEGER, primaryKey: true },
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     payee_name: DataTypes.STRING(128),
     part_postcode: DataTypes.STRING(8),
     town: DataTypes.STRING(128),
@@ -31,7 +31,9 @@ async function createModels (sequelizeInstance) {
     parliamentary_constituency: DataTypes.STRING(64),
     scheme: DataTypes.STRING(64),
     scheme_detail: DataTypes.STRING(128),
-    amount: DataTypes.DOUBLE
+    amount: DataTypes.DOUBLE,
+    payment_date: DataTypes.DATEONLY,
+    activity_level: DataTypes.STRING(64)
   })
 }
 

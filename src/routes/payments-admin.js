@@ -162,7 +162,7 @@ const paymentsAdmin = [
       payload: {
         parse: false,
         output: 'stream',
-        allow: 'multipart/form-data',
+        allow: 'text/csv',
         maxBytes: 104857600 // 100MB
       }
     },
