@@ -20,7 +20,7 @@ const {
   deletePaymentsByYear,
   getFinancialYears,
   bulkUploadPayments
-} = await import('../../../src/data/admin.js')
+} = await import('../../../src/data/payments-admin.js')
 
 describe('admin', () => {
   beforeEach(() => {

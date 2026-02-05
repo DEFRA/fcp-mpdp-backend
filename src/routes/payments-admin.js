@@ -9,7 +9,7 @@ import {
   getAllPaymentsForAdmin,
   searchPaymentsForAdmin,
   bulkUploadPayments
-} from '../data/admin.js'
+} from '../data/payments-admin.js'
 
 const paymentsAdmin = [
   {

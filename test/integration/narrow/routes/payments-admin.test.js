@@ -8,7 +8,7 @@ vi.mock('../../../../src/data/database.js', () => {
   }
 })
 
-vi.mock('../../../../src/data/admin.js')
+vi.mock('../../../../src/data/payments-admin.js')
 
 const {
   getPaymentById,
@@ -20,7 +20,7 @@ const {
   deletePaymentsByYear,
   getFinancialYears,
   bulkUploadPayments
-} = await import('../../../../src/data/admin.js')
+} = await import('../../../../src/data/payments-admin.js')
 
 const { createServer } = await import('../../../../src/server.js')
 
