@@ -4,7 +4,7 @@ import { paymentsSearch } from '../routes/payments-search.js'
 import { paymentsSummary } from '../routes/payments-summary.js'
 import { paymentsPayee } from '../routes/payments-payee.js'
 import { paymentsAdmin } from '../routes/payments-admin.js'
-import { paymentSummaryRoutes } from '../routes/payment-summary.js'
+import { paymentsSummaryAdmin } from '../routes/payments-summary-admin.js'
 
 const router = {
   plugin: {
@@ -14,7 +14,7 @@ const router = {
         [].concat(
           health,
           paymentsAdmin,
-          paymentSummaryRoutes,
+          paymentsSummaryAdmin,
           payments,
           paymentsSearch,
           paymentsSummary,

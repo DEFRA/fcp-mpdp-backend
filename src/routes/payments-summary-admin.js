@@ -5,15 +5,15 @@ import {
   createPaymentSummary,
   updatePaymentSummary,
   deletePaymentSummary
-} from '../data/payment-summary.js'
+} from '../data/payments-summary-admin.js'
 
-const paymentSummaryRoutes = [
+const paymentsSummaryAdmin = [
   {
     method: 'GET',
     path: '/v1/payments/admin/summary',
     options: {
       description: 'Get all payment summaries',
-      tags: ['api', 'admin', 'payment-summary']
+      tags: ['api', 'admin', 'summary']
     },
     handler: async (_request, h) => {
       const summaries = await getAllPaymentSummaries()
@@ -25,7 +25,7 @@ const paymentSummaryRoutes = [
     path: '/v1/payments/admin/summary/{id}',
     options: {
       description: 'Get payment summary by ID',
-      tags: ['api', 'admin', 'payment-summary'],
+      tags: ['api', 'admin', 'summary'],
       validate: {
         params: Joi.object({
           id: Joi.number().integer().positive().required()
@@ -48,7 +48,7 @@ const paymentSummaryRoutes = [
     path: '/v1/payments/admin/summary',
     options: {
       description: 'Create payment summary',
-      tags: ['api', 'admin', 'payment-summary'],
+      tags: ['api', 'admin', 'summary'],
       validate: {
         payload: Joi.object({
           financial_year: Joi.string().max(8).required(),
@@ -67,7 +67,7 @@ const paymentSummaryRoutes = [
     path: '/v1/payments/admin/summary/{id}',
     options: {
       description: 'Update payment summary',
-      tags: ['api', 'admin', 'payment-summary'],
+      tags: ['api', 'admin', 'summary'],
       validate: {
         params: Joi.object({
           id: Joi.number().integer().positive().required()
@@ -95,7 +95,7 @@ const paymentSummaryRoutes = [
     path: '/v1/payments/admin/summary/{id}',
     options: {
       description: 'Delete payment summary',
-      tags: ['api', 'admin', 'payment-summary'],
+      tags: ['api', 'admin', 'summary'],
       validate: {
         params: Joi.object({
           id: Joi.number().integer().positive().required()
@@ -115,4 +115,4 @@ const paymentSummaryRoutes = [
   }
 ]
 
-export { paymentSummaryRoutes }
+export { paymentsSummaryAdmin }

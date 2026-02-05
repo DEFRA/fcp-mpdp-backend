@@ -19,7 +19,7 @@ const {
   createPaymentSummary,
   updatePaymentSummary,
   deletePaymentSummary
-} = await import('../../../src/data/payment-summary.js')
+} = await import('../../../src/data/payments-summary-admin.js')
 
 describe('Payment Summary Data Layer', () => {
   beforeEach(() => {

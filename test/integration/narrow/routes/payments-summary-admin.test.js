@@ -7,7 +7,7 @@ vi.mock('../../../../src/data/database.js', () => {
   }
 })
 
-vi.mock('../../../../src/data/payment-summary.js')
+vi.mock('../../../../src/data/payments-summary-admin.js')
 
 const {
   getAllPaymentSummaries,
@@ -15,7 +15,7 @@ const {
   createPaymentSummary,
   updatePaymentSummary,
   deletePaymentSummary
-} = await import('../../../../src/data/payment-summary.js')
+} = await import('../../../../src/data/payments-summary-admin.js')
 
 const { createServer } = await import('../../../../src/server.js')
 
