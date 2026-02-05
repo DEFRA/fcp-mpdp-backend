@@ -7,31 +7,33 @@ async function createModels (sequelizeInstance) {
   sequelize = sequelizeInstance
 
   models.SchemePayments = sequelize.define('aggregate_scheme_payments', {
-    id: { type: DataTypes.INTEGER, primaryKey: true },
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     financial_year: DataTypes.STRING(8),
     scheme: DataTypes.STRING(64),
-    total_amount: DataTypes.DOUBLE
+    total_amount: DataTypes.DECIMAL(16, 2)
   })
 
   models.PaymentData = sequelize.define('payment_activity_data', {
-    payee_name: DataTypes.STRING(32),
-    part_postcode: DataTypes.STRING(8),
-    town: DataTypes.STRING(32),
-    county_council: DataTypes.STRING(64),
-    amount: DataTypes.DOUBLE
-  })
-
-  models.PaymentDetail = sequelize.define('payment_activity_data', {
-    id: { type: DataTypes.INTEGER, primaryKey: true },
     payee_name: DataTypes.STRING(128),
     part_postcode: DataTypes.STRING(8),
     town: DataTypes.STRING(128),
-    county_council: DataTypes.STRING(64),
+    county_council: DataTypes.STRING(128),
+    amount: DataTypes.DECIMAL(16, 2)
+  })
+
+  models.PaymentDetail = sequelize.define('payment_activity_data', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    payee_name: DataTypes.STRING(128),
+    part_postcode: DataTypes.STRING(8),
+    town: DataTypes.STRING(128),
+    county_council: DataTypes.STRING(128),
     financial_year: DataTypes.STRING(8),
     parliamentary_constituency: DataTypes.STRING(64),
     scheme: DataTypes.STRING(64),
     scheme_detail: DataTypes.STRING(128),
-    amount: DataTypes.DOUBLE
+    amount: DataTypes.DECIMAL(16, 2),
+    payment_date: DataTypes.DATEONLY,
+    activity_level: DataTypes.STRING(64)
   })
 }
 
