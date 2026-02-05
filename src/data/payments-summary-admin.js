@@ -1,17 +1,17 @@
 import { models } from './database.js'
 
 export async function getAllPaymentSummaries () {
-  return await models.SchemePayments.findAll({
+  return models.SchemePayments.findAll({
     order: [['financial_year', 'DESC'], ['scheme', 'ASC']]
   })
 }
 
 export async function getPaymentSummaryById (id) {
-  return await models.SchemePayments.findByPk(id)
+  return models.SchemePayments.findByPk(id)
 }
 
 export async function createPaymentSummary (data) {
-  return await models.SchemePayments.create(data)
+  return models.SchemePayments.create(data)
 }
 
 export async function updatePaymentSummary (id, data) {
@@ -19,7 +19,7 @@ export async function updatePaymentSummary (id, data) {
   if (!summary) {
     return null
   }
-  return await summary.update(data)
+  return summary.update(data)
 }
 
 export async function deletePaymentSummary (id) {
