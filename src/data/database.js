@@ -7,7 +7,7 @@ async function createModels (sequelizeInstance) {
   sequelize = sequelizeInstance
 
   models.SchemePayments = sequelize.define('aggregate_scheme_payments', {
-    id: { type: DataTypes.INTEGER, primaryKey: true },
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     financial_year: DataTypes.STRING(8),
     scheme: DataTypes.STRING(64),
     total_amount: DataTypes.DOUBLE
