@@ -30,12 +30,10 @@ const paymentsAdmin = [
     handler: async (request, h) => {
       const { page, limit, searchString } = request.query
 
-      if (searchString) {
-        const payments = await searchPaymentsForAdmin(searchString, page, limit)
-        return h.response(payments)
-      }
+      const payments = searchString
+        ? await searchPaymentsForAdmin(searchString, page, limit)
+        : await getAllPaymentsForAdmin(page, limit)
 
-      const payments = await getAllPaymentsForAdmin(page, limit)
       return h.response(payments)
     }
   },
