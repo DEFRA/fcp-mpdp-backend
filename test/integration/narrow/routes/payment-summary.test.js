@@ -88,7 +88,7 @@ describe('Payment Summary Admin Routes', () => {
 
       expect(response.statusCode).toBe(200)
       expect(JSON.parse(response.payload)).toEqual(mockSummary)
-      expect(getPaymentSummaryById).toHaveBeenCalledWith('1')
+      expect(getPaymentSummaryById).toHaveBeenCalledWith(1)
     })
 
     test('should return 404 for non-existent ID', async () => {
@@ -197,7 +197,7 @@ describe('Payment Summary Admin Routes', () => {
 
       expect(response.statusCode).toBe(200)
       expect(JSON.parse(response.payload)).toEqual(updatedSummary)
-      expect(updatePaymentSummary).toHaveBeenCalledWith('1', updateData)
+      expect(updatePaymentSummary).toHaveBeenCalledWith(1, updateData)
     })
 
     test('should return 404 for non-existent ID', async () => {
@@ -228,7 +228,7 @@ describe('Payment Summary Admin Routes', () => {
       const response = await server.inject(options)
 
       expect(response.statusCode).toBe(200)
-      expect(deletePaymentSummary).toHaveBeenCalledWith('1')
+      expect(deletePaymentSummary).toHaveBeenCalledWith(1)
     })
 
     test('should return 404 for non-existent ID', async () => {
