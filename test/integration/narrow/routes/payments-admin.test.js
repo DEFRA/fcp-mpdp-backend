@@ -394,7 +394,7 @@ describe('payments admin routes', () => {
 
       const response = await server.inject(options)
       expect(response.statusCode).toBe(200)
-      expect(bulkSetPublishedDate).toHaveBeenCalledWith('23/24', '2024-01-15')
+      expect(bulkSetPublishedDate).toHaveBeenCalledWith('23/24', new Date('2024-01-15'))
       expect(JSON.parse(response.payload)).toEqual(mockResult)
     })
 
@@ -414,7 +414,7 @@ describe('payments admin routes', () => {
 
       const response = await server.inject(options)
       expect(response.statusCode).toBe(200)
-      expect(bulkSetPublishedDate).toHaveBeenCalledWith('22/23', '2023-12-01')
+      expect(bulkSetPublishedDate).toHaveBeenCalledWith('22/23', new Date('2023-12-01'))
     })
 
     test('should return 400 for invalid date', async () => {
