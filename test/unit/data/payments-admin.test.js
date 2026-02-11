@@ -47,8 +47,28 @@ describe('admin', () => {
 
       const result = await createPayment(paymentData)
 
-      expect(models.PaymentDetail.create).toHaveBeenCalledWith(paymentData)
+      expect(models.PaymentDetail.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...paymentData,
+          published_date: expect.any(Date)
+        })
+      )
       expect(result).toEqual(mockPayment)
+    })
+
+    test('should set published_date to current date', async () => {
+      const paymentData = { payee_name: 'Test Payee', amount: 1000 }
+      const mockPayment = { id: 1, ...paymentData }
+      models.PaymentDetail.create = vi.fn().mockResolvedValue(mockPayment)
+
+      const beforeCreate = new Date()
+      await createPayment(paymentData)
+      const afterCreate = new Date()
+
+      const createCall = models.PaymentDetail.create.mock.calls[0][0]
+      expect(createCall.published_date).toBeInstanceOf(Date)
+      expect(createCall.published_date.getTime()).toBeGreaterThanOrEqual(beforeCreate.getTime())
+      expect(createCall.published_date.getTime()).toBeLessThanOrEqual(afterCreate.getTime())
     })
   })
 
@@ -263,13 +283,15 @@ Jane Doe,NE1,Newcastle,Newcastle Central,Tyne and Wear,CS,12500.00,23/24,2023-06
             payee_name: 'John Smith',
             part_postcode: 'SW1A',
             amount: 5000.50,
-            financial_year: '23/24'
+            financial_year: '23/24',
+            published_date: expect.any(Date)
           }),
           expect.objectContaining({
             payee_name: 'Jane Doe',
             part_postcode: 'NE1',
             amount: 12500.00,
-            financial_year: '23/24'
+            financial_year: '23/24',
+            published_date: expect.any(Date)
           })
         ]),
         { validate: true }
@@ -277,6 +299,24 @@ Jane Doe,NE1,Newcastle,Newcastle Central,Tyne and Wear,CS,12500.00,23/24,2023-06
       expect(result.success).toBe(true)
       expect(result.imported).toBe(2)
       expect(result.errors).toEqual([])
+    })
+
+    test('should set published_date on all imported payments', async () => {
+      const csvData = `payee_name,part_postcode,town,parliamentary_constituency,county_council,scheme,amount,financial_year,payment_date,scheme_detail,activity_level
+Test Payee,SW1,London,Westminster,Greater London,BPS,1000.00,23/24,2024-01-01,Scheme Detail,Farm`
+
+      const stream = Readable.from([csvData])
+      models.PaymentDetail.bulkCreate = vi.fn().mockResolvedValue([])
+
+      const beforeUpload = new Date()
+      await bulkUploadPayments(stream)
+      const afterUpload = new Date()
+
+      const paymentsCreated = models.PaymentDetail.bulkCreate.mock.calls[0][0]
+      expect(paymentsCreated).toHaveLength(1)
+      expect(paymentsCreated[0].published_date).toBeInstanceOf(Date)
+      expect(paymentsCreated[0].published_date.getTime()).toBeGreaterThanOrEqual(beforeUpload.getTime())
+      expect(paymentsCreated[0].published_date.getTime()).toBeLessThanOrEqual(afterUpload.getTime())
     })
 
     test('should handle CSV with invalid data', async () => {
@@ -295,7 +335,8 @@ Test Payee,SW1,London,Westminster,Greater London,BPS,not_a_number,23/24,2024-01-
         expect.arrayContaining([
           expect.objectContaining({
             payee_name: 'Test Payee',
-            amount: NaN
+            amount: NaN,
+            published_date: expect.any(Date)
           })
         ]),
         { validate: true }

@@ -33,7 +33,8 @@ async function createModels (sequelizeInstance) {
     scheme_detail: DataTypes.STRING(128),
     amount: DataTypes.DECIMAL(16, 2),
     payment_date: DataTypes.DATEONLY,
-    activity_level: DataTypes.STRING(64)
+    activity_level: DataTypes.STRING(64),
+    published_date: DataTypes.DATEONLY
   })
 }
 

@@ -59,9 +59,9 @@ describe('database', () => {
       expect(models.PaymentDetail.name).toBe('payment_activity_data')
     })
 
-    test('should include id, payee_name, part_postcode, town, county_council, financial_year, parliamentary_constituency, scheme, scheme_detail, amount, payment_date and activity_level fields', () => {
+    test('should include id, payee_name, part_postcode, town, county_council, financial_year, parliamentary_constituency, scheme, scheme_detail, amount, payment_date activity_level and published_date fields', () => {
       const fields = Object.keys(models.PaymentDetail.tableAttributes)
-      expect(fields).toEqual(['id', 'payee_name', 'part_postcode', 'town', 'county_council', 'financial_year', 'parliamentary_constituency', 'scheme', 'scheme_detail', 'amount', 'payment_date', 'activity_level'])
+      expect(fields).toEqual(['id', 'payee_name', 'part_postcode', 'town', 'county_council', 'financial_year', 'parliamentary_constituency', 'scheme', 'scheme_detail', 'amount', 'payment_date', 'activity_level', 'published_date'])
     })
   })
 
