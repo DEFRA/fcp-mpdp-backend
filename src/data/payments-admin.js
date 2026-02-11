@@ -54,6 +54,22 @@ async function deletePaymentsByYear (financialYear) {
   }
 }
 
+async function bulkSetPublishedDate (financialYear, publishedDate) {
+  const paymentCount = await models.PaymentDetail.count({
+    where: { financial_year: financialYear }
+  })
+
+  await models.PaymentDetail.update(
+    { published_date: publishedDate },
+    { where: { financial_year: financialYear } }
+  )
+
+  return {
+    updated: true,
+    paymentCount
+  }
+}
+
 async function getFinancialYears () {
   const years = await models.PaymentDetail.findAll({
     attributes: ['financial_year'],
@@ -168,5 +184,6 @@ export {
   getFinancialYears,
   getAllPaymentsForAdmin,
   searchPaymentsForAdmin,
-  bulkUploadPayments
+  bulkUploadPayments,
+  bulkSetPublishedDate
 }

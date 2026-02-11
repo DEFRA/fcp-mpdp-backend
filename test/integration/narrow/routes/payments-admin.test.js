@@ -19,7 +19,8 @@ const {
   searchPaymentsForAdmin,
   deletePaymentsByYear,
   getFinancialYears,
-  bulkUploadPayments
+  bulkUploadPayments,
+  bulkSetPublishedDate
 } = await import('../../../../src/data/payments-admin.js')
 
 const { createServer } = await import('../../../../src/server.js')
@@ -372,6 +373,72 @@ describe('payments admin routes', () => {
         success: false,
         error: 'Invalid CSV format'
       })
+    })
+  })
+
+  describe('PUT /v1/payments/admin/payments/year/{financialYear}/published-date', () => {
+    test('should return 200 with update results', async () => {
+      const mockResult = {
+        updated: true,
+        paymentCount: 100
+      }
+      bulkSetPublishedDate.mockResolvedValue(mockResult)
+
+      const options = {
+        method: 'PUT',
+        url: '/v1/payments/admin/payments/year/23%2F24/published-date',
+        payload: {
+          published_date: '2024-01-15'
+        }
+      }
+
+      const response = await server.inject(options)
+      expect(response.statusCode).toBe(200)
+      expect(bulkSetPublishedDate).toHaveBeenCalledWith('23/24', '2024-01-15')
+      expect(JSON.parse(response.payload)).toEqual(mockResult)
+    })
+
+    test('should handle URL-encoded financial year', async () => {
+      bulkSetPublishedDate.mockResolvedValue({
+        updated: true,
+        paymentCount: 50
+      })
+
+      const options = {
+        method: 'PUT',
+        url: '/v1/payments/admin/payments/year/22%2F23/published-date',
+        payload: {
+          published_date: '2023-12-01'
+        }
+      }
+
+      const response = await server.inject(options)
+      expect(response.statusCode).toBe(200)
+      expect(bulkSetPublishedDate).toHaveBeenCalledWith('22/23', '2023-12-01')
+    })
+
+    test('should return 400 for invalid date', async () => {
+      const options = {
+        method: 'PUT',
+        url: '/v1/payments/admin/payments/year/23%2F24/published-date',
+        payload: {
+          published_date: 'invalid-date'
+        }
+      }
+
+      const response = await server.inject(options)
+      expect(response.statusCode).toBe(400)
+    })
+
+    test('should return 400 for missing published_date', async () => {
+      const options = {
+        method: 'PUT',
+        url: '/v1/payments/admin/payments/year/23%2F24/published-date',
+        payload: {}
+      }
+
+      const response = await server.inject(options)
+      expect(response.statusCode).toBe(400)
     })
   })
 })

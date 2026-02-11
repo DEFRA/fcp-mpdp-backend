@@ -8,7 +8,8 @@ import {
   getFinancialYears,
   getAllPaymentsForAdmin,
   searchPaymentsForAdmin,
-  bulkUploadPayments
+  bulkUploadPayments,
+  bulkSetPublishedDate
 } from '../data/payments-admin.js'
 
 const paymentsAdmin = [
@@ -205,6 +206,29 @@ const paymentsAdmin = [
     handler: async (request, h) => {
       const { financialYear } = request.params
       const result = await deletePaymentsByYear(financialYear)
+      return h.response(result)
+    }
+  },
+  {
+    method: 'PUT',
+    path: '/v1/payments/admin/payments/year/{financialYear}/published-date',
+    options: {
+      description: 'Bulk set published date for all payments by financial year',
+      notes: 'Updates the published_date field for all payment records matching the financial year',
+      tags: ['api', 'admin', 'payments'],
+      validate: {
+        params: Joi.object({
+          financialYear: Joi.string().max(8).required()
+        }),
+        payload: Joi.object({
+          published_date: Joi.date().required()
+        })
+      }
+    },
+    handler: async (request, h) => {
+      const { financialYear } = request.params
+      const { published_date: publishedDate } = request.payload
+      const result = await bulkSetPublishedDate(financialYear, publishedDate)
       return h.response(result)
     }
   }
