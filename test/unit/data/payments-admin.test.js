@@ -18,6 +18,7 @@ const {
   getAllPaymentsForAdmin,
   searchPaymentsForAdmin,
   deletePaymentsByYear,
+  deletePaymentsByPublishedDate,
   getFinancialYears,
   bulkUploadPayments
 } = await import('../../../src/data/payments-admin.js')
@@ -228,6 +229,55 @@ describe('admin', () => {
         deleted: true,
         paymentCount: 50,
         schemeCount: 5
+      })
+    })
+  })
+
+  describe('deletePaymentsByPublishedDate', () => {
+    test('should delete all payments with published date equal to or earlier than provided date', async () => {
+      const testDate = '2024-01-15'
+      models.PaymentDetail.count = vi.fn().mockResolvedValue(75)
+      models.PaymentDetail.destroy = vi.fn().mockResolvedValue(75)
+
+      const result = await deletePaymentsByPublishedDate(testDate)
+
+      expect(models.PaymentDetail.count).toHaveBeenCalledWith({
+        where: {
+          published_date: {
+            [models.PaymentDetail.sequelize.Sequelize.Op.lte]: testDate
+          }
+        }
+      })
+      expect(models.PaymentDetail.destroy).toHaveBeenCalledWith({
+        where: {
+          published_date: {
+            [models.PaymentDetail.sequelize.Sequelize.Op.lte]: testDate
+          }
+        }
+      })
+      expect(result).toEqual({
+        deleted: true,
+        paymentCount: 75
+      })
+    })
+
+    test('should handle date as Date object', async () => {
+      const testDate = new Date('2024-01-15')
+      models.PaymentDetail.count = vi.fn().mockResolvedValue(30)
+      models.PaymentDetail.destroy = vi.fn().mockResolvedValue(30)
+
+      const result = await deletePaymentsByPublishedDate(testDate)
+
+      expect(models.PaymentDetail.count).toHaveBeenCalledWith({
+        where: {
+          published_date: {
+            [models.PaymentDetail.sequelize.Sequelize.Op.lte]: testDate
+          }
+        }
+      })
+      expect(result).toEqual({
+        deleted: true,
+        paymentCount: 30
       })
     })
   })

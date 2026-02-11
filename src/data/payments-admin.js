@@ -54,6 +54,29 @@ async function deletePaymentsByYear (financialYear) {
   }
 }
 
+async function deletePaymentsByPublishedDate (publishedDate) {
+  const paymentCount = await models.PaymentDetail.count({
+    where: {
+      published_date: {
+        [models.PaymentDetail.sequelize.Sequelize.Op.lte]: publishedDate
+      }
+    }
+  })
+
+  await models.PaymentDetail.destroy({
+    where: {
+      published_date: {
+        [models.PaymentDetail.sequelize.Sequelize.Op.lte]: publishedDate
+      }
+    }
+  })
+
+  return {
+    deleted: true,
+    paymentCount
+  }
+}
+
 async function bulkSetPublishedDate (financialYear, publishedDate) {
   const paymentCount = await models.PaymentDetail.count({
     where: { financial_year: financialYear }
@@ -181,6 +204,7 @@ export {
   updatePayment,
   deletePayment,
   deletePaymentsByYear,
+  deletePaymentsByPublishedDate,
   getFinancialYears,
   getAllPaymentsForAdmin,
   searchPaymentsForAdmin,
