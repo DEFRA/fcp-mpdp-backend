@@ -6,7 +6,10 @@ async function getPaymentById (id) {
 }
 
 async function createPayment (paymentData) {
-  return models.PaymentDetail.create(paymentData)
+  return models.PaymentDetail.create({
+    ...paymentData,
+    published_date: new Date()
+  })
 }
 
 async function updatePayment (id, paymentData) {
@@ -128,7 +131,8 @@ async function bulkUploadPayments (csvStream) {
             financial_year: row.financial_year,
             payment_date: row.payment_date ? new Date(row.payment_date) : null,
             scheme_detail: row.scheme_detail,
-            activity_level: row.activity_level
+            activity_level: row.activity_level,
+            published_date: new Date()
           }
           payments.push(payment)
         } catch (err) {
