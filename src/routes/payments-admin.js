@@ -5,6 +5,7 @@ import {
   updatePayment,
   deletePayment,
   deletePaymentsByYear,
+  deletePaymentsByPublishedDate,
   getFinancialYears,
   getAllPaymentsForAdmin,
   searchPaymentsForAdmin,
@@ -206,6 +207,25 @@ const paymentsAdmin = [
     handler: async (request, h) => {
       const { financialYear } = request.params
       const result = await deletePaymentsByYear(financialYear)
+      return h.response(result)
+    }
+  },
+  {
+    method: 'DELETE',
+    path: '/v1/payments/admin/payments/published-date/{publishedDate}',
+    options: {
+      description: 'Delete all payments by published date',
+      notes: 'Removes all payment records with published date equal to or earlier than the provided date',
+      tags: ['api', 'admin', 'payments'],
+      validate: {
+        params: Joi.object({
+          publishedDate: Joi.string().isoDate().required()
+        })
+      }
+    },
+    handler: async (request, h) => {
+      const { publishedDate } = request.params
+      const result = await deletePaymentsByPublishedDate(publishedDate)
       return h.response(result)
     }
   },

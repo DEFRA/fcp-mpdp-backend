@@ -18,6 +18,7 @@ const {
   getAllPaymentsForAdmin,
   searchPaymentsForAdmin,
   deletePaymentsByYear,
+  deletePaymentsByPublishedDate,
   getFinancialYears,
   bulkUploadPayments,
   bulkSetPublishedDate
@@ -322,6 +323,52 @@ describe('payments admin routes', () => {
       const response = await server.inject(options)
       expect(response.statusCode).toBe(200)
       expect(deletePaymentsByYear).toHaveBeenCalledWith('22/23')
+    })
+  })
+
+  describe('DELETE /v1/payments/admin/payments/published-date/{publishedDate}', () => {
+    test('should return 200 with deletion counts', async () => {
+      const mockResult = {
+        deleted: true,
+        paymentCount: 80
+      }
+      deletePaymentsByPublishedDate.mockResolvedValue(mockResult)
+
+      const options = {
+        method: 'DELETE',
+        url: '/v1/payments/admin/payments/published-date/2024-01-15'
+      }
+
+      const response = await server.inject(options)
+      expect(response.statusCode).toBe(200)
+      expect(deletePaymentsByPublishedDate).toHaveBeenCalledWith('2024-01-15T00:00:00.000Z')
+      expect(JSON.parse(response.payload)).toEqual(mockResult)
+    })
+
+    test('should handle date with different formats', async () => {
+      deletePaymentsByPublishedDate.mockResolvedValue({
+        deleted: true,
+        paymentCount: 25
+      })
+
+      const options = {
+        method: 'DELETE',
+        url: '/v1/payments/admin/payments/published-date/2023-12-31'
+      }
+
+      const response = await server.inject(options)
+      expect(response.statusCode).toBe(200)
+      expect(deletePaymentsByPublishedDate).toHaveBeenCalledWith('2023-12-31T00:00:00.000Z')
+    })
+
+    test('should return 400 for invalid date format', async () => {
+      const options = {
+        method: 'DELETE',
+        url: '/v1/payments/admin/payments/published-date/invalid-date'
+      }
+
+      const response = await server.inject(options)
+      expect(response.statusCode).toBe(400)
     })
   })
 
