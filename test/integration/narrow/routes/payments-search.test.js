@@ -1,9 +1,42 @@
 import { describe, test, beforeEach, afterEach, vi, expect } from 'vitest'
 
+vi.mock('../../../../src/config.js', () => ({
+  config: {
+    get: vi.fn((key) => {
+      if (key === 'search.cacheTtl') return 0 // Disable caching for integration tests
+      if (key === 'postgres') {
+        return {
+          host: 'localhost',
+          port: 5432,
+          database: 'test',
+          user: 'test',
+          passwordForLocalDev: 'test',
+          hostRead: 'localhost',
+          portRead: 5432,
+          getTokenFromRds: false,
+          dialect: 'postgres',
+          poolMax: 5,
+          poolMin: 0,
+          poolIdle: 10000
+        }
+      }
+      if (key === 'log') return { isEnabled: false, level: 'info', format: 'ecs', redact: [] }
+      if (key === 'environment') return 'test'
+      if (key === 'serviceName') return 'fcp-mpdp-backend'
+      if (key === 'serviceVersion') return '1.0.0'
+      if (key === 'port') return 3000
+      if (key === 'host') return 'localhost'
+      if (key === 'isDev') return false
+      return null
+    }),
+    validate: vi.fn()
+  }
+}))
+
 vi.mock('../../../../src/data/database.js', () => {
   return {
     createModels: vi.fn(),
-    healthCheck: vi.fn()
+    healthCheck: vi.fn().mockResolvedValue(true)
   }
 })
 
