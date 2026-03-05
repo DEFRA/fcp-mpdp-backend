@@ -60,16 +60,16 @@ async function getSearchSuggestions (searchString) {
   const searchResults = await searchAllPayments(searchString)
   const groupedResults = groupByPayee(searchResults)
 
-  const result = {
+  const suggestions = {
     count: groupedResults.length,
     rows: groupedResults
-      .map((result) =>
-        removeKeys(result, ['scheme', 'total_amount', 'financial_year'])
+      .map((groupedResult) =>
+        removeKeys(groupedResult, ['scheme', 'total_amount', 'financial_year'])
       )
       .slice(0, suggestionResultsLimit)
   }
 
-  return result
+  return suggestions
 }
 
 async function getFuseInstance () {
