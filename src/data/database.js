@@ -80,7 +80,6 @@ async function getPayeePayments (payeeName, partPostcode) {
 }
 
 async function getAllPayments () {
-  const startTime = performance.now()
   const payments = await models.PaymentData.findAll({
     group: [
       'payee_name',
@@ -101,8 +100,7 @@ async function getAllPayments () {
     ],
     raw: true
   })
-  const endTime = performance.now()
-  console.log(`[PERF] getAllPayments DB query: ${(endTime - startTime).toFixed(2)}ms (${payments.length} records)`)
+
   return payments
 }
 
