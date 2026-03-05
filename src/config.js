@@ -179,6 +179,14 @@ const config = convict({
       env: 'POSTGRES_POOL_IDLE'
     }
 
+  },
+  search: {
+    cacheTtl: {
+      doc: 'Fuse search cache TTL in milliseconds (0 to disable caching)',
+      format: 'nat',
+      default: 120000,
+      env: 'SEARCH_CACHE_TTL'
+    }
   }
 })
 

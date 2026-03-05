@@ -6,16 +6,24 @@ import {
   groupByPayee,
   removeKeys
 } from './filters.js'
+import { config } from '../config.js'
 
 const options = {
   includeScore: true,
-  threshold: 0.3,
+  threshold: 0.25,
   ignoreLocation: true,
   useExtendedSearch: false,
   keys: ['payee_name', 'part_postcode', 'town', 'county_council']
 }
 
 const suggestionResultsLimit = 6
+
+const CACHE_SYMBOL_NAME = 'cache-token'
+
+let fuseInstance = null
+let lastCacheTime = 0
+let buildingCache = null
+let cacheToken = Symbol(CACHE_SYMBOL_NAME)
 
 async function getPaymentData ({
   searchString,
@@ -51,20 +59,74 @@ async function getPaymentData ({
 async function getSearchSuggestions (searchString) {
   const searchResults = await searchAllPayments(searchString)
   const groupedResults = groupByPayee(searchResults)
-  return {
+
+  const suggestions = {
     count: groupedResults.length,
     rows: groupedResults
-      .map((result) =>
-        removeKeys(result, ['scheme', 'total_amount', 'financial_year'])
+      .map((groupedResult) =>
+        removeKeys(groupedResult, ['scheme', 'total_amount', 'financial_year'])
       )
       .slice(0, suggestionResultsLimit)
   }
+
+  return suggestions
+}
+
+async function getFuseInstance () {
+  // If cache is currently being built, wait for it
+  if (buildingCache) {
+    return buildingCache
+  }
+
+  const cacheTtl = config.get('search.cacheTtl')
+  const now = Date.now()
+
+  // Return cached instance if still fresh
+  if (fuseInstance && cacheTtl > 0 && (now - lastCacheTime) < cacheTtl) {
+    return fuseInstance
+  }
+
+  // Build new cache
+  const buildToken = cacheToken
+
+  buildingCache = (async () => {
+    const buildStartTime = now
+    const payments = await getAllPayments()
+
+    const newInstance = new Fuse(payments, options)
+
+    // Only set cache if token hasn't changed (not invalidated during build)
+    if (cacheToken === buildToken) {
+      fuseInstance = newInstance
+      lastCacheTime = buildStartTime
+    }
+
+    return newInstance
+  })()
+
+  try {
+    return await buildingCache
+  } catch (error) {
+    cacheToken = Symbol(CACHE_SYMBOL_NAME)
+    fuseInstance = null
+    lastCacheTime = 0
+    throw error
+  } finally {
+    buildingCache = null
+  }
+}
+
+function invalidateSearchCache () {
+  cacheToken = Symbol(CACHE_SYMBOL_NAME)
+  fuseInstance = null
+  lastCacheTime = 0
+  buildingCache = null
 }
 
 async function searchAllPayments (searchString) {
-  const payments = await getAllPayments()
-  const fuse = new Fuse(payments, options)
-  return fuse.search(searchString).map((result) => result.item)
+  const fuse = await getFuseInstance()
+  const results = fuse.search(searchString).map((result) => result.item)
+  return results
 }
 
 function sortResults (results, sortBy) {
@@ -74,4 +136,4 @@ function sortResults (results, sortBy) {
   return results
 }
 
-export { getPaymentData, getSearchSuggestions }
+export { getPaymentData, getSearchSuggestions, invalidateSearchCache }

@@ -1,15 +1,18 @@
 import { models } from './database.js'
 import csvParser from 'csv-parser'
+import { invalidateSearchCache } from './search.js'
 
 async function getPaymentById (id) {
   return models.PaymentDetail.findByPk(id, { raw: true })
 }
 
 async function createPayment (paymentData) {
-  return models.PaymentDetail.create({
+  const payment = await models.PaymentDetail.create({
     ...paymentData,
     published_date: new Date()
   })
+  invalidateSearchCache()
+  return payment
 }
 
 async function updatePayment (id, paymentData) {
@@ -18,6 +21,7 @@ async function updatePayment (id, paymentData) {
     return null
   }
   await payment.update(paymentData)
+  invalidateSearchCache()
   return payment.get({ plain: true })
 }
 
@@ -27,6 +31,7 @@ async function deletePayment (id) {
     return null
   }
   await payment.destroy()
+  invalidateSearchCache()
   return { deleted: true }
 }
 
@@ -46,6 +51,8 @@ async function deletePaymentsByYear (financialYear) {
   await models.SchemePayments.destroy({
     where: { financial_year: financialYear }
   })
+
+  invalidateSearchCache()
 
   return {
     deleted: true,
@@ -71,6 +78,8 @@ async function deletePaymentsByPublishedDate (publishedDate) {
     }
   })
 
+  invalidateSearchCache()
+
   return {
     deleted: true,
     paymentCount
@@ -86,6 +95,8 @@ async function bulkSetPublishedDate (financialYear, publishedDate) {
     { published_date: publishedDate },
     { where: { financial_year: financialYear } }
   )
+
+  invalidateSearchCache()
 
   return {
     updated: true,
@@ -182,6 +193,7 @@ async function bulkUploadPayments (csvStream) {
         try {
           if (payments.length > 0) {
             await models.PaymentDetail.bulkCreate(payments, { validate: true })
+            invalidateSearchCache()
           }
           resolve({
             success: true,

@@ -100,6 +100,7 @@ async function getAllPayments () {
     ],
     raw: true
   })
+
   return payments
 }
 
