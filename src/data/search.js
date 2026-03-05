@@ -81,7 +81,7 @@ async function getFuseInstance () {
   // If cache is currently being built, wait for it
   if (buildingCache) {
     console.log('[PERF] Waiting for in-progress cache build')
-    return await buildingCache
+    return buildingCache
   }
 
   const cacheTtl = config.get('search.cacheTtl')
