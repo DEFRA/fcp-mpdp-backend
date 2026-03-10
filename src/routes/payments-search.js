@@ -10,7 +10,7 @@ const paymentsSearch = {
     tags: ['api', 'payments'],
     validate: {
       query: Joi.object({
-        searchString: Joi.string().trim().min(1).required()
+        searchString: Joi.string().trim().min(1).max(32).required()
       }),
       failAction: async (_request, h, error) =>
         h.response(error.toString()).code(400).takeover()

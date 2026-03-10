@@ -124,4 +124,13 @@ describe('payments-search routes', () => {
     const response = await server.inject(options)
     expect(response.statusCode).toBe(400)
   })
+
+  test('GET /v1/payments/search should return 400 if search string exceeds 32 characters', async () => {
+    const options = {
+      method: 'GET',
+      url: `/v1/payments/search?searchString=${'a'.repeat(33)}`
+    }
+    const response = await server.inject(options)
+    expect(response.statusCode).toBe(400)
+  })
 })

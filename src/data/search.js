@@ -125,7 +125,7 @@ function invalidateSearchCache () {
 
 async function searchAllPayments (searchString) {
   const fuse = await getFuseInstance()
-  const results = fuse.search(searchString).map((result) => result.item)
+  const results = fuse.search(searchString.slice(0, 32)).map((result) => result.item)
   return results
 }
 

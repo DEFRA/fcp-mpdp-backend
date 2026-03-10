@@ -209,6 +209,17 @@ describe('search', () => {
       const data = await getSearchSuggestions('payee name')
       expect(data.rows.length).toBe(6)
     })
+
+    test('should not throw when searchString exceeds 32 characters', async () => {
+      await expect(getSearchSuggestions('payee name that is longer than 32!')).resolves.toBeInstanceOf(Object)
+    })
+
+    test('should return same results for a string over 32 chars as for its first 32 chars', async () => {
+      const padded = 'payee name extra padding beyond thirty-two'
+      const cappedData = await getSearchSuggestions(padded.slice(0, 32))
+      const paddedData = await getSearchSuggestions(padded)
+      expect(paddedData.count).toBe(cappedData.count)
+    })
   })
 
   describe('getSearchSuggestions - Fuzzy Matching Behavior', () => {
