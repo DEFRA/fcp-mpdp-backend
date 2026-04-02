@@ -4,6 +4,7 @@
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-mpdp-backend&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-mpdp-backend)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-mpdp-backend&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-mpdp-backend)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-mpdp-backend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-mpdp-backend)
+[![Dependabot](https://badgen.net/github/dependabot/DEFRA/fcp-mpdp-backend)](https://github.com/DEFRA/fcp-mpdp-backend/security/dependabot)
 
 # fcp-mpdp-backend
 
