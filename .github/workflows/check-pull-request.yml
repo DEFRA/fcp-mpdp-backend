@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   pr-validator:
@@ -45,4 +46,4 @@ jobs:
         with:
           fail-on-severity: moderate
           retry-on-snapshot-warnings: true
-          retry-on-snapshot-warnings-timeout: 180
+          comment-summary-in-pr: always
