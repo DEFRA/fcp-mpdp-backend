@@ -41,7 +41,7 @@
     "@hapi/vision": "7.0.3",
     "@json2csv/node": "7.0.6",
     "aws-embedded-metrics": "4.2.0",
-    "convict": "6.2.4",
+    "convict": "6.2.5",
     "convict-format-with-validator": "6.2.0",
     "csv-parser": "3.0.0",
     "fuse.js": "7.1.0",
@@ -53,8 +53,8 @@
     "pg": "8.16.3",
     "pino": "10.0.0",
     "pino-pretty": "13.0.0",
-    "sequelize": "6.37.7",
-    "undici": "7.18.2"
+    "sequelize": "6.37.8",
+    "undici": "7.24.0"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "3.2.4",
