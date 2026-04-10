@@ -9,11 +9,19 @@ const mockSigner = {
   getAuthToken: vi.fn()
 }
 vi.mock('@aws-sdk/rds-signer', () => ({
-  Signer: vi.fn(() => mockSigner)
+  Signer: vi.fn(function () {
+    return mockSigner
+  })
 }))
 
 vi.mock('@aws-sdk/credential-providers', () => ({
   fromNodeProviderChain: vi.fn(() => ({}))
+}))
+
+vi.mock('../../../../src/config.js', () => ({
+  config: {
+    get: vi.fn(() => ({}))
+  }
 }))
 
 vi.mock('../../../../src/data/database.js', () => ({
@@ -51,8 +59,10 @@ describe('postgres plugin', () => {
       poolIdle: 840000
     }
 
-    mockSequelize.mockReturnValue({
-      authenticate: vi.fn().mockResolvedValue(undefined)
+    mockSequelize.mockImplementation(function () {
+      return {
+        authenticate: vi.fn().mockResolvedValue(undefined)
+      }
     })
   })
 
