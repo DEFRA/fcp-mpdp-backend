@@ -86,9 +86,9 @@ function getAllPaymentsCsvStream () {
 }
 
 function getReadableAmount (amount) {
-  const floatAmount = parseFloat(amount)
+  const floatAmount = Number.parseFloat(amount)
 
-  if (isNaN(floatAmount)) {
+  if (Number.isNaN(floatAmount)) {
     return '0.00'
   }
 
