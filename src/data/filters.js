@@ -51,7 +51,7 @@ function groupByPayee (searchResults) {
       acc.push({ ...item })
     } else {
       payee.total_amount =
-        parseFloat(payee.total_amount) + parseFloat(item.total_amount)
+        Number.parseFloat(payee.total_amount) + Number.parseFloat(item.total_amount)
     }
 
     return acc
@@ -66,12 +66,12 @@ function filterByAmounts (searchResults, amounts) {
   }
   const amountRanges = amounts.map((range) => {
     const [from, to] = range.split('-')
-    return { from: parseFloat(from), to: parseFloat(to) }
+    return { from: Number.parseFloat(from), to: Number.parseFloat(to) }
   })
 
   return searchResults.filter((result) => {
     return amountRanges.some((range) => {
-      const totalAmount = parseFloat(result.total_amount)
+      const totalAmount = Number.parseFloat(result.total_amount)
       return !range.to
         ? totalAmount >= range.from
         : totalAmount >= range.from && totalAmount <= range.to
