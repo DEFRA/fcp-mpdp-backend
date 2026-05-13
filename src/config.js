@@ -184,7 +184,7 @@ const config = convict({
     cacheTtl: {
       doc: 'Fuse search cache TTL in milliseconds (0 to disable caching)',
       format: 'nat',
-      default: 120000,
+      default: 3600000,
       env: 'SEARCH_CACHE_TTL'
     }
   }

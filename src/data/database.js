@@ -104,6 +104,16 @@ async function getAllPayments () {
   return payments
 }
 
+async function getDistinctPayees () {
+  const payees = await models.PaymentData.findAll({
+    group: ['payee_name', 'part_postcode', 'town', 'county_council'],
+    attributes: ['payee_name', 'part_postcode', 'town', 'county_council'],
+    raw: true
+  })
+
+  return payees
+}
+
 async function getAllPaymentsByPage (page = 1, pageSize = 250) {
   return models.PaymentData.findAll({
     group: [
@@ -139,5 +149,6 @@ export {
   getAnnualPayments,
   getPayeePayments,
   getAllPayments,
+  getDistinctPayees,
   getAllPaymentsByPage
 }

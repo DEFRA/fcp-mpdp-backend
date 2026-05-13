@@ -40,24 +40,21 @@ function filterByYears (results, years) {
 }
 
 function groupByPayee (searchResults) {
-  const result = searchResults.reduce((acc, item) => {
-    const payee = acc.find(
-      (r) =>
-        r.payee_name === item.payee_name &&
-        r.part_postcode === item.part_postcode
-    )
+  const map = new Map()
 
-    if (!payee) {
-      acc.push({ ...item })
+  for (const item of searchResults) {
+    const key = `${item.payee_name}|${item.part_postcode}`
+    const existing = map.get(key)
+
+    if (!existing) {
+      map.set(key, { ...item })
     } else {
-      payee.total_amount =
-        Number.parseFloat(payee.total_amount) + Number.parseFloat(item.total_amount)
+      existing.total_amount =
+        Number.parseFloat(existing.total_amount) + Number.parseFloat(item.total_amount)
     }
+  }
 
-    return acc
-  }, [])
-
-  return result
+  return Array.from(map.values())
 }
 
 function filterByAmounts (searchResults, amounts) {
@@ -94,19 +91,20 @@ function getFilterOptions (searchResults) {
 
 function getUniqueFields (searchResults, field) {
   try {
-    return searchResults.reduce((acc, result) => {
-      if (
-        !acc.length ||
-        acc.findIndex(
-          (y) =>
-            y?.toString().toLowerCase() ===
-            result[field]?.toString().toLowerCase()
-        ) === -1
-      ) {
-        acc.push(result[field].toString())
+    const seen = new Set()
+    const result = []
+
+    for (const item of searchResults) {
+      const value = item[field]?.toString()
+      const lower = value?.toLowerCase()
+
+      if (lower !== undefined && !seen.has(lower)) {
+        seen.add(lower)
+        result.push(value)
       }
-      return acc
-    }, [])
+    }
+
+    return result
   } catch (err) {
     console.error(err)
     return []
