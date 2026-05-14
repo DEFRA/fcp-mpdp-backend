@@ -11,7 +11,7 @@ vi.mock('../../../../src/config.js', () => ({
 
 vi.mock('../../../../src/data/database.js')
 
-const { getAllPayments } = await import('../../../../src/data/database.js')
+const { getAllPayments, getDistinctPayees } = await import('../../../../src/data/database.js')
 const { getPaymentData, getSearchSuggestions } = await import('../../../../src/data/search.js')
 
 describe('search', () => {
@@ -23,6 +23,11 @@ describe('search', () => {
       { payee_name: 'payee name 2', part_postcode: 'part postcode', town: 'town', county_council: 'county council', scheme: 'scheme 1', financial_year: '20/21', total_amount: 300 },
       { payee_name: 'payee name 2', part_postcode: 'part postcode', town: 'town', county_council: 'county council', scheme: 'scheme 2', financial_year: '20/21', total_amount: 400 },
       { payee_name: 'payee name 3', part_postcode: 'part postcode', town: 'town', county_council: 'county council', scheme: 'scheme 1', financial_year: '21/22', total_amount: 500 }
+    ])
+    getDistinctPayees.mockResolvedValue([
+      { payee_name: 'payee name 1', part_postcode: 'part postcode', town: 'town', county_council: 'county council' },
+      { payee_name: 'payee name 2', part_postcode: 'part postcode', town: 'town', county_council: 'county council' },
+      { payee_name: 'payee name 3', part_postcode: 'part postcode', town: 'town', county_council: 'county council' }
     ])
   })
 
@@ -205,7 +210,7 @@ describe('search', () => {
     })
 
     test('should restrict results to 6 suggestions', async () => {
-      getAllPayments.mockResolvedValue(Array(50).fill().map((_, i) => ({ payee_name: `payee name ${i}`, part_postcode: 'part postcode', town: 'town', county_council: 'county council', scheme: 'scheme', financial_year: '20/21', total_amount: 100 })))
+      getDistinctPayees.mockResolvedValue(Array(50).fill().map((_, i) => ({ payee_name: `payee name ${i}`, part_postcode: 'part postcode', town: 'town', county_council: 'county council' })))
       const data = await getSearchSuggestions('payee name')
       expect(data.rows.length).toBe(6)
     })
@@ -225,11 +230,11 @@ describe('search', () => {
   describe('getSearchSuggestions - Fuzzy Matching Behavior', () => {
     describe('Typo tolerance', () => {
       beforeEach(() => {
-        getAllPayments.mockResolvedValue([
-          { payee_name: 'Jones Farming Ltd', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 },
-          { payee_name: 'Smith Agriculture', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '20/21', total_amount: 2000 },
-          { payee_name: 'Johnson Partners', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester', scheme: 'ES', financial_year: '20/21', total_amount: 3000 },
-          { payee_name: 'Brown Estates', part_postcode: 'KL01 2MN', town: 'Leeds', county_council: 'West Yorkshire', scheme: 'BPS', financial_year: '21/22', total_amount: 4000 }
+        getDistinctPayees.mockResolvedValue([
+          { payee_name: 'Jones Farming Ltd', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' },
+          { payee_name: 'Smith Agriculture', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London' },
+          { payee_name: 'Johnson Partners', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester' },
+          { payee_name: 'Brown Estates', part_postcode: 'KL01 2MN', town: 'Leeds', county_council: 'West Yorkshire' }
         ])
       })
 
@@ -248,11 +253,11 @@ describe('search', () => {
 
     describe('Partial matching', () => {
       beforeEach(() => {
-        getAllPayments.mockResolvedValue([
-          { payee_name: 'Jonathan Smith Farms', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 },
-          { payee_name: 'Jones Family Trust', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '20/21', total_amount: 2000 },
-          { payee_name: 'Jon & Co Agriculture', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester', scheme: 'ES', financial_year: '20/21', total_amount: 3000 },
-          { payee_name: 'Jonesborough Estates', part_postcode: 'KL01 2MN', town: 'Leeds', county_council: 'West Yorkshire', scheme: 'BPS', financial_year: '21/22', total_amount: 4000 }
+        getDistinctPayees.mockResolvedValue([
+          { payee_name: 'Jonathan Smith Farms', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' },
+          { payee_name: 'Jones Family Trust', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London' },
+          { payee_name: 'Jon & Co Agriculture', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester' },
+          { payee_name: 'Jonesborough Estates', part_postcode: 'KL01 2MN', town: 'Leeds', county_council: 'West Yorkshire' }
         ])
       })
 
@@ -280,10 +285,10 @@ describe('search', () => {
 
     describe('Case insensitivity', () => {
       beforeEach(() => {
-        getAllPayments.mockResolvedValue([
-          { payee_name: 'McDonald Farming', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 },
-          { payee_name: 'SMITH AGRICULTURE', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '20/21', total_amount: 2000 },
-          { payee_name: 'o\'Brien Estates', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester', scheme: 'ES', financial_year: '20/21', total_amount: 3000 }
+        getDistinctPayees.mockResolvedValue([
+          { payee_name: 'McDonald Farming', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' },
+          { payee_name: 'SMITH AGRICULTURE', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London' },
+          { payee_name: 'o\'Brien Estates', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester' }
         ])
       })
 
@@ -308,11 +313,11 @@ describe('search', () => {
 
     describe('Multi-field searching', () => {
       beforeEach(() => {
-        getAllPayments.mockResolvedValue([
-          { payee_name: 'Adams Agriculture', part_postcode: 'BS1 2AB', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 },
-          { payee_name: 'Bennett Farms', part_postcode: 'AB12 3CD', town: 'Aberdeen', county_council: 'Aberdeenshire', scheme: 'CS', financial_year: '20/21', total_amount: 2000 },
-          { payee_name: 'Carter Estates', part_postcode: 'DE45 6FG', town: 'Manchester', county_council: 'Greater Manchester', scheme: 'ES', financial_year: '20/21', total_amount: 3000 },
-          { payee_name: 'Davis Holdings', part_postcode: 'LS1 7HJ', town: 'Leeds', county_council: 'West Yorkshire', scheme: 'BPS', financial_year: '21/22', total_amount: 4000 }
+        getDistinctPayees.mockResolvedValue([
+          { payee_name: 'Adams Agriculture', part_postcode: 'BS1 2AB', town: 'Bristol', county_council: 'Bristol' },
+          { payee_name: 'Bennett Farms', part_postcode: 'AB12 3CD', town: 'Aberdeen', county_council: 'Aberdeenshire' },
+          { payee_name: 'Carter Estates', part_postcode: 'DE45 6FG', town: 'Manchester', county_council: 'Greater Manchester' },
+          { payee_name: 'Davis Holdings', part_postcode: 'LS1 7HJ', town: 'Leeds', county_council: 'West Yorkshire' }
         ])
       })
 
@@ -343,10 +348,10 @@ describe('search', () => {
       })
 
       test('should prioritize exact matches over fuzzy matches', async () => {
-        getAllPayments.mockResolvedValue([
-          { payee_name: 'Manchester Farms', part_postcode: 'M1 2AB', town: 'Manchester', county_council: 'Greater Manchester', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 },
-          { payee_name: 'Smith Agriculture', part_postcode: 'BS12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'CS', financial_year: '20/21', total_amount: 2000 },
-          { payee_name: 'Manheim Estates', part_postcode: 'DE45 6FG', town: 'Derby', county_council: 'Derbyshire', scheme: 'ES', financial_year: '20/21', total_amount: 3000 }
+        getDistinctPayees.mockResolvedValue([
+          { payee_name: 'Manchester Farms', part_postcode: 'M1 2AB', town: 'Manchester', county_council: 'Greater Manchester' },
+          { payee_name: 'Smith Agriculture', part_postcode: 'BS12 3CD', town: 'Bristol', county_council: 'Bristol' },
+          { payee_name: 'Manheim Estates', part_postcode: 'DE45 6FG', town: 'Derby', county_council: 'Derbyshire' }
         ])
 
         const data = await getSearchSuggestions('manchester')
@@ -357,11 +362,11 @@ describe('search', () => {
 
     describe('Special characters and edge cases', () => {
       beforeEach(() => {
-        getAllPayments.mockResolvedValue([
-          { payee_name: 'O\'Connor & Sons', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 },
-          { payee_name: 'Smith-Jones Farms', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '20/21', total_amount: 2000 },
-          { payee_name: 'Brown & Co.', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester', scheme: 'ES', financial_year: '20/21', total_amount: 3000 },
-          { payee_name: '123 Farming Ltd', part_postcode: 'KL01 2MN', town: 'Leeds', county_council: 'West Yorkshire', scheme: 'BPS', financial_year: '21/22', total_amount: 4000 }
+        getDistinctPayees.mockResolvedValue([
+          { payee_name: 'O\'Connor & Sons', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' },
+          { payee_name: 'Smith-Jones Farms', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London' },
+          { payee_name: 'Brown & Co.', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester' },
+          { payee_name: '123 Farming Ltd', part_postcode: 'KL01 2MN', town: 'Leeds', county_council: 'West Yorkshire' }
         ])
       })
 
@@ -407,12 +412,12 @@ describe('search', () => {
 
     describe('Result quality and relevance', () => {
       beforeEach(() => {
-        getAllPayments.mockResolvedValue([
-          { payee_name: 'Wilson Farms', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 },
-          { payee_name: 'Wilson Agriculture Ltd', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '20/21', total_amount: 2000 },
-          { payee_name: 'Wilson & Sons', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester', scheme: 'ES', financial_year: '20/21', total_amount: 3000 },
-          { payee_name: 'Williamson Estates', part_postcode: 'KL01 2MN', town: 'Leeds', county_council: 'West Yorkshire', scheme: 'BPS', financial_year: '21/22', total_amount: 4000 },
-          { payee_name: 'Smith Agriculture', part_postcode: 'MN34 5OP', town: 'Birmingham', county_council: 'West Midlands', scheme: 'CS', financial_year: '21/22', total_amount: 5000 }
+        getDistinctPayees.mockResolvedValue([
+          { payee_name: 'Wilson Farms', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' },
+          { payee_name: 'Wilson Agriculture Ltd', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London' },
+          { payee_name: 'Wilson & Sons', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester' },
+          { payee_name: 'Williamson Estates', part_postcode: 'KL01 2MN', town: 'Leeds', county_council: 'West Yorkshire' },
+          { payee_name: 'Smith Agriculture', part_postcode: 'MN34 5OP', town: 'Birmingham', county_council: 'West Midlands' }
         ])
       })
 
@@ -435,11 +440,11 @@ describe('search', () => {
       })
 
       test('should not return excessive irrelevant results', async () => {
-        getAllPayments.mockResolvedValue([
-          { payee_name: 'Anderson Ltd', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 },
-          { payee_name: 'Peterson Farms', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '20/21', total_amount: 2000 },
-          { payee_name: 'Thompson Agriculture', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester', scheme: 'ES', financial_year: '20/21', total_amount: 3000 },
-          { payee_name: 'Henderson Estates', part_postcode: 'KL01 2MN', town: 'Leeds', county_council: 'West Yorkshire', scheme: 'BPS', financial_year: '21/22', total_amount: 4000 }
+        getDistinctPayees.mockResolvedValue([
+          { payee_name: 'Anderson Ltd', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' },
+          { payee_name: 'Peterson Farms', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London' },
+          { payee_name: 'Thompson Agriculture', part_postcode: 'GH78 9IJ', town: 'Manchester', county_council: 'Greater Manchester' },
+          { payee_name: 'Henderson Estates', part_postcode: 'KL01 2MN', town: 'Leeds', county_council: 'West Yorkshire' }
         ])
 
         const data = await getSearchSuggestions('xyz')
@@ -455,13 +460,10 @@ describe('search', () => {
           payee_name: `Test Payee ${i}`,
           part_postcode: `AB${i} ${i}CD`,
           town: `Town ${i}`,
-          county_council: `County ${i}`,
-          scheme: 'BPS',
-          financial_year: '20/21',
-          total_amount: i * 100
+          county_council: `County ${i}`
         }))
 
-        getAllPayments.mockResolvedValue(largeDataset)
+        getDistinctPayees.mockResolvedValue(largeDataset)
 
         const data = await getSearchSuggestions('Test Payee 42')
 
@@ -471,15 +473,13 @@ describe('search', () => {
       })
 
       test('should handle dataset with duplicate payee names across schemes', async () => {
-        getAllPayments.mockResolvedValue([
-          { payee_name: 'Wilson Farms', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 },
-          { payee_name: 'Wilson Farms', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'CS', financial_year: '20/21', total_amount: 2000 },
-          { payee_name: 'Wilson Farms', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'ES', financial_year: '21/22', total_amount: 3000 }
+        getDistinctPayees.mockResolvedValue([
+          { payee_name: 'Wilson Farms', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' }
         ])
 
         const data = await getSearchSuggestions('wilson')
 
-        // After grouping, should have only one Wilson Farms entry
+        // Distinct payees query already deduplicates, should have one entry
         expect(data.count).toBe(1)
         expect(data.rows[0].payee_name).toBe('Wilson Farms')
       })

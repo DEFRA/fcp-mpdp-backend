@@ -1,10 +1,8 @@
 import Fuse from 'fuse.js'
-import { getAllPayments } from './database.js'
+import { getAllPayments, getDistinctPayees } from './database.js'
 import {
   applyFiltersAndGroupByPayee,
-  getFilterOptions,
-  groupByPayee,
-  removeKeys
+  getFilterOptions
 } from './filters.js'
 import { config } from '../config.js'
 
@@ -20,10 +18,17 @@ const suggestionResultsLimit = 6
 
 const CACHE_SYMBOL_NAME = 'cache-token'
 
+// Full search cache (used by getPaymentData)
 let fuseInstance = null
 let lastCacheTime = 0
 let buildingCache = null
 let cacheToken = Symbol(CACHE_SYMBOL_NAME)
+
+// Autocomplete cache (used by getSearchSuggestions)
+let autocompleteFuseInstance = null
+let autocompleteLastCacheTime = 0
+let autocompleteBuildingCache = null
+let autocompleteCacheToken = Symbol(CACHE_SYMBOL_NAME)
 
 async function getPaymentData ({
   searchString,
@@ -57,16 +62,14 @@ async function getPaymentData ({
 }
 
 async function getSearchSuggestions (searchString) {
-  const searchResults = await searchAllPayments(searchString)
-  const groupedResults = groupByPayee(searchResults)
+  const fuse = await getAutocompleteFuseInstance()
+  const searchResults = fuse
+    .search(searchString.slice(0, 32), { limit: 50 })
+    .map((result) => result.item)
 
   const suggestions = {
-    count: groupedResults.length,
-    rows: groupedResults
-      .map((groupedResult) =>
-        removeKeys(groupedResult, ['scheme', 'total_amount', 'financial_year'])
-      )
-      .slice(0, suggestionResultsLimit)
+    count: searchResults.length,
+    rows: searchResults.slice(0, suggestionResultsLimit)
   }
 
   return suggestions
@@ -116,11 +119,63 @@ async function getFuseInstance () {
   }
 }
 
+async function getAutocompleteFuseInstance () {
+  if (autocompleteBuildingCache) {
+    return autocompleteBuildingCache
+  }
+
+  const cacheTtl = config.get('search.cacheTtl')
+  const now = Date.now()
+
+  if (autocompleteFuseInstance && cacheTtl > 0 && (now - autocompleteLastCacheTime) < cacheTtl) {
+    return autocompleteFuseInstance
+  }
+
+  const buildToken = autocompleteCacheToken
+
+  autocompleteBuildingCache = (async () => {
+    const buildStartTime = now
+    const payees = await getDistinctPayees()
+
+    const newInstance = new Fuse(payees, options)
+
+    if (autocompleteCacheToken === buildToken) {
+      autocompleteFuseInstance = newInstance
+      autocompleteLastCacheTime = buildStartTime
+    }
+
+    return newInstance
+  })()
+
+  try {
+    return await autocompleteBuildingCache
+  } catch (error) {
+    autocompleteCacheToken = Symbol(CACHE_SYMBOL_NAME)
+    autocompleteFuseInstance = null
+    autocompleteLastCacheTime = 0
+    throw error
+  } finally {
+    autocompleteBuildingCache = null
+  }
+}
+
 function invalidateSearchCache () {
   cacheToken = Symbol(CACHE_SYMBOL_NAME)
   fuseInstance = null
   lastCacheTime = 0
   buildingCache = null
+
+  autocompleteCacheToken = Symbol(CACHE_SYMBOL_NAME)
+  autocompleteFuseInstance = null
+  autocompleteLastCacheTime = 0
+  autocompleteBuildingCache = null
+}
+
+async function warmSearchCache () {
+  await Promise.all([
+    getFuseInstance(),
+    getAutocompleteFuseInstance()
+  ])
 }
 
 async function searchAllPayments (searchString) {
@@ -136,4 +191,4 @@ function sortResults (results, sortBy) {
   return results
 }
 
-export { getPaymentData, getSearchSuggestions, invalidateSearchCache }
+export { getPaymentData, getSearchSuggestions, invalidateSearchCache, warmSearchCache }

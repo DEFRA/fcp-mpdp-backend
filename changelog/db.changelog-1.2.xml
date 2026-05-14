@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog 
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog" 
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" 
+  xmlns:pro="http://www.liquibase.org/xml/ns/pro" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext 
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd 
+                      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.9.xsd 
+                      http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+  <changeSet author="Defra" id="1">
+    <tagDatabase tag="v1.2.0" />
+  </changeSet>
+  <changeSet author="Defra" id="2">
+    <createIndex tableName="payment_activity_data" indexName="idx_pad_payee_name">
+      <column name="payee_name" />
+    </createIndex>
+    <createIndex tableName="payment_activity_data" indexName="idx_pad_town">
+      <column name="town" />
+    </createIndex>
+    <createIndex tableName="payment_activity_data" indexName="idx_pad_county_council">
+      <column name="county_council" />
+    </createIndex>
+    <createIndex tableName="payment_activity_data" indexName="idx_pad_part_postcode">
+      <column name="part_postcode" />
+    </createIndex>
+  </changeSet>
+</databaseChangeLog>

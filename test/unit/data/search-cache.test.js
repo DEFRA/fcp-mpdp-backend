@@ -12,7 +12,7 @@ vi.mock('../../../src/config.js', () => ({
 vi.mock('../../../src/data/database.js')
 
 const { config } = await import('../../../src/config.js')
-const { getAllPayments } = await import('../../../src/data/database.js')
+const { getDistinctPayees } = await import('../../../src/data/database.js')
 
 // Need to import after mocks are set up
 let getSearchSuggestions, invalidateSearchCache
@@ -28,9 +28,9 @@ describe('search cache', () => {
     getSearchSuggestions = searchModule.getSearchSuggestions
     invalidateSearchCache = searchModule.invalidateSearchCache
 
-    getAllPayments.mockResolvedValue([
-      { payee_name: 'Test Payee 1', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 },
-      { payee_name: 'Test Payee 2', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '20/21', total_amount: 2000 }
+    getDistinctPayees.mockResolvedValue([
+      { payee_name: 'Test Payee 1', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' },
+      { payee_name: 'Test Payee 2', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London' }
     ])
 
     config.get.mockImplementation((key) => {
@@ -47,7 +47,7 @@ describe('search cache', () => {
     test('should fetch payments from database on first call', async () => {
       await getSearchSuggestions('test')
 
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
     })
 
     test('should use cached Fuse instance on subsequent calls', async () => {
@@ -56,7 +56,7 @@ describe('search cache', () => {
       await getSearchSuggestions('third')
 
       // Should only call DB once (first call builds cache)
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
     })
 
     test('should return correct results from cached instance', async () => {
@@ -67,7 +67,7 @@ describe('search cache', () => {
       expect(result1).toHaveProperty('rows')
       expect(result2).toHaveProperty('count')
       expect(result2).toHaveProperty('rows')
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -85,13 +85,13 @@ describe('search cache', () => {
       const newGetSearchSuggestions = searchModule.getSearchSuggestions
 
       await newGetSearchSuggestions('test')
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
 
       // Wait for TTL to expire
       await new Promise(resolve => setTimeout(resolve, 150))
 
       await newGetSearchSuggestions('test')
-      expect(getAllPayments).toHaveBeenCalledTimes(2)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
     })
 
     test('should use cache when within TTL window', async () => {
@@ -109,19 +109,19 @@ describe('search cache', () => {
       await newGetSearchSuggestions('test')
 
       // Still within TTL, should use cache
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('Cache invalidation', () => {
     test('should rebuild cache after manual invalidation', async () => {
       await getSearchSuggestions('test')
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
 
       invalidateSearchCache()
 
       await getSearchSuggestions('test')
-      expect(getAllPayments).toHaveBeenCalledTimes(2)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
     })
 
     test('should invalidate cache multiple times', async () => {
@@ -133,7 +133,7 @@ describe('search cache', () => {
 
       await getSearchSuggestions('test')
 
-      expect(getAllPayments).toHaveBeenCalledTimes(3)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(3)
     })
 
     test('should work correctly after invalidation and re-caching', async () => {
@@ -149,7 +149,7 @@ describe('search cache', () => {
       // Use cache again
       const result3 = await getSearchSuggestions('another')
 
-      expect(getAllPayments).toHaveBeenCalledTimes(2)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
       expect(result1).toHaveProperty('count')
       expect(result2).toHaveProperty('count')
       expect(result3).toHaveProperty('count')
@@ -172,34 +172,34 @@ describe('search cache', () => {
       await newGetSearchSuggestions('test')
 
       // Should fetch from DB every time
-      expect(getAllPayments).toHaveBeenCalledTimes(3)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(3)
     })
   })
 
   describe('Cache with changing data', () => {
     test('should return stale data until invalidated', async () => {
-      getAllPayments.mockResolvedValue([
-        { payee_name: 'Original Data', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+      getDistinctPayees.mockResolvedValue([
+        { payee_name: 'Original Data', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' }
       ])
 
       const result1 = await getSearchSuggestions('original')
       expect(result1.rows.some(r => r.payee_name === 'Original Data')).toBe(true)
 
       // Change the mock data
-      getAllPayments.mockResolvedValue([
-        { payee_name: 'Updated Data', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+      getDistinctPayees.mockResolvedValue([
+        { payee_name: 'Updated Data', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' }
       ])
 
       // Should still return original (cached) data
       await getSearchSuggestions('updated')
-      expect(getAllPayments).toHaveBeenCalledTimes(1) // Still using cache
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1) // Still using cache
 
       // Invalidate cache
       invalidateSearchCache()
 
       // Should now return updated data
       await getSearchSuggestions('updated')
-      expect(getAllPayments).toHaveBeenCalledTimes(2) // Fetched new data
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2) // Fetched new data
     })
   })
 
@@ -212,7 +212,7 @@ describe('search cache', () => {
       await Promise.all(calls)
 
       // Should only build cache once
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
     })
 
     test('should handle large dataset caching', async () => {
@@ -220,18 +220,15 @@ describe('search cache', () => {
         payee_name: `Payee ${i}`,
         part_postcode: `AB${i}`,
         town: `Town ${i}`,
-        county_council: `County ${i}`,
-        scheme: 'BPS',
-        financial_year: '20/21',
-        total_amount: i * 100
+        county_council: `County ${i}`
       }))
 
-      getAllPayments.mockResolvedValue(largeDataset)
+      getDistinctPayees.mockResolvedValue(largeDataset)
 
       const result1 = await getSearchSuggestions('payee')
       const result2 = await getSearchSuggestions('town')
 
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
       expect(result1).toHaveProperty('count')
       expect(result2).toHaveProperty('count')
     })
@@ -239,15 +236,15 @@ describe('search cache', () => {
 
   describe('Error handling', () => {
     test('should handle database errors gracefully', async () => {
-      getAllPayments.mockRejectedValue(new Error('Database connection failed'))
+      getDistinctPayees.mockRejectedValue(new Error('Database connection failed'))
 
       await expect(getSearchSuggestions('test')).rejects.toThrow('Database connection failed')
     })
 
     test('should rebuild cache after previous error', async () => {
-      getAllPayments.mockRejectedValueOnce(new Error('Temporary error'))
-      getAllPayments.mockResolvedValueOnce([
-        { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+      getDistinctPayees.mockRejectedValueOnce(new Error('Temporary error'))
+      getDistinctPayees.mockResolvedValueOnce([
+        { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
       ])
 
       await expect(getSearchSuggestions('test')).rejects.toThrow('Temporary error')
@@ -255,16 +252,16 @@ describe('search cache', () => {
       // Should retry and succeed
       const result = await getSearchSuggestions('test')
       expect(result).toHaveProperty('count')
-      expect(getAllPayments).toHaveBeenCalledTimes(2)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
     })
 
     test('should reset all cache state when build fails', async () => {
       // First, build a valid cache
       await getSearchSuggestions('test')
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
 
       // Now make it fail
-      getAllPayments.mockRejectedValueOnce(new Error('Build failed'))
+      getDistinctPayees.mockRejectedValueOnce(new Error('Build failed'))
 
       // Try to search, which will attempt to rebuild (since enough time passed or manual invalidation)
       invalidateSearchCache()
@@ -272,39 +269,39 @@ describe('search cache', () => {
       await expect(getSearchSuggestions('another')).rejects.toThrow('Build failed')
 
       // Verify cache state is completely reset by ensuring next call rebuilds from scratch
-      getAllPayments.mockResolvedValueOnce([
-        { payee_name: 'New Data', part_postcode: 'CD34', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '21/22', total_amount: 3000 }
+      getDistinctPayees.mockResolvedValueOnce([
+        { payee_name: 'New Data', part_postcode: 'CD34', town: 'London', county_council: 'Greater London' }
       ])
 
       const result = await getSearchSuggestions('new')
       expect(result).toHaveProperty('count')
-      // Should have called getAllPayments: 1 (initial) + 1 (failed) + 1 (recovery) = 3
-      expect(getAllPayments).toHaveBeenCalledTimes(3)
+      // Should have called getDistinctPayees: 1 (initial) + 1 (failed) + 1 (recovery) = 3
+      expect(getDistinctPayees).toHaveBeenCalledTimes(3)
     })
 
     test('should not leave buildingCache promise hanging after error', async () => {
-      getAllPayments.mockRejectedValueOnce(new Error('Build error'))
+      getDistinctPayees.mockRejectedValueOnce(new Error('Build error'))
 
       await expect(getSearchSuggestions('test')).rejects.toThrow('Build error')
 
       // Should be able to build cache again without waiting for stale promise
-      getAllPayments.mockResolvedValueOnce([
-        { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+      getDistinctPayees.mockResolvedValueOnce([
+        { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
       ])
 
       const result = await getSearchSuggestions('test')
       expect(result).toHaveProperty('count')
-      expect(getAllPayments).toHaveBeenCalledTimes(2)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
     })
   })
 
   describe('Cache TTL atomicity', () => {
     test('should set cache time to build start, not build end', async () => {
-      // Mock getAllPayments to take some time
-      getAllPayments.mockImplementation(async () => {
+      // Mock getDistinctPayees to take some time
+      getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100)) // Simulate 100ms DB query
         return [
-          { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -319,7 +316,7 @@ describe('search cache', () => {
       await getSearchSuggestions('another')
 
       // Should use cached instance, not rebuild
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
     })
 
     test('should not have race condition with TTL check during slow build', async () => {
@@ -333,10 +330,10 @@ describe('search cache', () => {
       const newGetSearchSuggestions = searchModule.getSearchSuggestions
 
       // Make build take significant time
-      getAllPayments.mockImplementation(async () => {
+      getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 200))
         return [
-          { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -350,17 +347,17 @@ describe('search cache', () => {
       await Promise.all([firstRequest, secondRequest])
 
       // Both should have used the same cache build, so only 1 DB call
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('Cache invalidation during build', () => {
     test('should discard cache build if invalidated during build', async () => {
-      // Make getAllPayments take time (simulating slow DB query)
-      getAllPayments.mockImplementation(async () => {
+      // Make getDistinctPayees take time (simulating slow DB query)
+      getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return [
-          { payee_name: 'Old Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Old Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -375,22 +372,22 @@ describe('search cache', () => {
       await searchPromise
 
       // Now search again - should rebuild with fresh data, not use stale cache
-      getAllPayments.mockResolvedValueOnce([
-        { payee_name: 'New Data', part_postcode: 'CD34', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '21/22', total_amount: 2000 }
+      getDistinctPayees.mockResolvedValueOnce([
+        { payee_name: 'New Data', part_postcode: 'CD34', town: 'London', county_council: 'Greater London' }
       ])
 
       const result = await getSearchSuggestions('new')
 
-      // Should have called getAllPayments twice: once for old build (discarded), once for new build
-      expect(getAllPayments).toHaveBeenCalledTimes(2)
+      // Should have called getDistinctPayees twice: once for old build (discarded), once for new build
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
       expect(result).toHaveProperty('count')
     })
 
     test('should handle multiple invalidations during build', async () => {
-      getAllPayments.mockImplementation(async () => {
+      getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 150))
         return [
-          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -410,21 +407,21 @@ describe('search cache', () => {
       await searchPromise
 
       // Next search should rebuild
-      getAllPayments.mockResolvedValueOnce([
-        { payee_name: 'Fresh', part_postcode: 'EF56', town: 'Manchester', county_council: 'Greater Manchester', scheme: 'ES', financial_year: '22/23', total_amount: 3000 }
+      getDistinctPayees.mockResolvedValueOnce([
+        { payee_name: 'Fresh', part_postcode: 'EF56', town: 'Manchester', county_council: 'Greater Manchester' }
       ])
 
       await getSearchSuggestions('fresh')
 
       // Should have 2 DB calls: original (discarded) + new rebuild
-      expect(getAllPayments).toHaveBeenCalledTimes(2)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
     })
 
     test('should handle invalidation immediately after build starts', async () => {
-      getAllPayments.mockImplementation(async () => {
+      getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return [
-          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -438,20 +435,20 @@ describe('search cache', () => {
       await searchPromise
 
       // Rebuild with new data
-      getAllPayments.mockResolvedValueOnce([
-        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '21/22', total_amount: 2000 }
+      getDistinctPayees.mockResolvedValueOnce([
+        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London' }
       ])
 
       await getSearchSuggestions('new')
 
-      expect(getAllPayments).toHaveBeenCalledTimes(2)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
     })
 
     test('should handle invalidation just before build completes', async () => {
-      getAllPayments.mockImplementation(async () => {
+      getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return [
-          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -464,20 +461,20 @@ describe('search cache', () => {
       await searchPromise
 
       // Next search should rebuild
-      getAllPayments.mockResolvedValueOnce([
-        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '21/22', total_amount: 2000 }
+      getDistinctPayees.mockResolvedValueOnce([
+        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London' }
       ])
 
       await getSearchSuggestions('new')
 
-      expect(getAllPayments).toHaveBeenCalledTimes(2)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
     })
 
     test('should correctly handle concurrent searches with invalidation', async () => {
-      getAllPayments.mockImplementation(async () => {
+      getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return [
-          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -495,21 +492,21 @@ describe('search cache', () => {
 
       // All should have waited for the same build, but it was discarded
       // Next search should trigger a new build
-      getAllPayments.mockResolvedValueOnce([
-        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '21/22', total_amount: 2000 }
+      getDistinctPayees.mockResolvedValueOnce([
+        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London' }
       ])
 
       await getSearchSuggestions('new')
 
       // Should have 2 DB calls: original (discarded) + new build
-      expect(getAllPayments).toHaveBeenCalledTimes(2)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
     })
 
     test('should preserve cache if no invalidation during build', async () => {
-      getAllPayments.mockImplementation(async () => {
+      getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return [
-          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -521,7 +518,7 @@ describe('search cache', () => {
       await getSearchSuggestions('third')
 
       // Should only have built cache once
-      expect(getAllPayments).toHaveBeenCalledTimes(1)
+      expect(getDistinctPayees).toHaveBeenCalledTimes(1)
     })
   })
 })

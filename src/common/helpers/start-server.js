@@ -2,6 +2,7 @@ import { config } from '../../config.js'
 
 import { createServer } from '../../server.js'
 import { createLogger } from './logging/logger.js'
+import { warmSearchCache } from '../../data/search.js'
 
 async function startServer () {
   let server
@@ -14,6 +15,10 @@ async function startServer () {
     server.logger.info(
       `Access your backend on http://localhost:${config.get('port')}`
     )
+
+    warmSearchCache().catch((err) => {
+      server.logger.error(err, 'Failed to pre-warm search cache')
+    })
   } catch (err) {
     const logger = createLogger()
     logger.info('Server failed to start')
