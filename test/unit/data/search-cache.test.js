@@ -179,7 +179,7 @@ describe('search cache', () => {
   describe('Cache with changing data', () => {
     test('should return stale data until invalidated', async () => {
       getDistinctPayees.mockResolvedValue([
-        { payee_name: 'Original Data', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+        { payee_name: 'Original Data', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' }
       ])
 
       const result1 = await getSearchSuggestions('original')
@@ -187,7 +187,7 @@ describe('search cache', () => {
 
       // Change the mock data
       getDistinctPayees.mockResolvedValue([
-        { payee_name: 'Updated Data', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+        { payee_name: 'Updated Data', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' }
       ])
 
       // Should still return original (cached) data
@@ -220,10 +220,7 @@ describe('search cache', () => {
         payee_name: `Payee ${i}`,
         part_postcode: `AB${i}`,
         town: `Town ${i}`,
-        county_council: `County ${i}`,
-        scheme: 'BPS',
-        financial_year: '20/21',
-        total_amount: i * 100
+        county_council: `County ${i}`
       }))
 
       getDistinctPayees.mockResolvedValue(largeDataset)
@@ -247,7 +244,7 @@ describe('search cache', () => {
     test('should rebuild cache after previous error', async () => {
       getDistinctPayees.mockRejectedValueOnce(new Error('Temporary error'))
       getDistinctPayees.mockResolvedValueOnce([
-        { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+        { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
       ])
 
       await expect(getSearchSuggestions('test')).rejects.toThrow('Temporary error')
@@ -273,7 +270,7 @@ describe('search cache', () => {
 
       // Verify cache state is completely reset by ensuring next call rebuilds from scratch
       getDistinctPayees.mockResolvedValueOnce([
-        { payee_name: 'New Data', part_postcode: 'CD34', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '21/22', total_amount: 3000 }
+        { payee_name: 'New Data', part_postcode: 'CD34', town: 'London', county_council: 'Greater London' }
       ])
 
       const result = await getSearchSuggestions('new')
@@ -289,7 +286,7 @@ describe('search cache', () => {
 
       // Should be able to build cache again without waiting for stale promise
       getDistinctPayees.mockResolvedValueOnce([
-        { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+        { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
       ])
 
       const result = await getSearchSuggestions('test')
@@ -304,7 +301,7 @@ describe('search cache', () => {
       getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100)) // Simulate 100ms DB query
         return [
-          { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -336,7 +333,7 @@ describe('search cache', () => {
       getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 200))
         return [
-          { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Test', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -360,7 +357,7 @@ describe('search cache', () => {
       getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return [
-          { payee_name: 'Old Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Old Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -376,7 +373,7 @@ describe('search cache', () => {
 
       // Now search again - should rebuild with fresh data, not use stale cache
       getDistinctPayees.mockResolvedValueOnce([
-        { payee_name: 'New Data', part_postcode: 'CD34', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '21/22', total_amount: 2000 }
+        { payee_name: 'New Data', part_postcode: 'CD34', town: 'London', county_council: 'Greater London' }
       ])
 
       const result = await getSearchSuggestions('new')
@@ -390,7 +387,7 @@ describe('search cache', () => {
       getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 150))
         return [
-          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -411,7 +408,7 @@ describe('search cache', () => {
 
       // Next search should rebuild
       getDistinctPayees.mockResolvedValueOnce([
-        { payee_name: 'Fresh', part_postcode: 'EF56', town: 'Manchester', county_council: 'Greater Manchester', scheme: 'ES', financial_year: '22/23', total_amount: 3000 }
+        { payee_name: 'Fresh', part_postcode: 'EF56', town: 'Manchester', county_council: 'Greater Manchester' }
       ])
 
       await getSearchSuggestions('fresh')
@@ -424,7 +421,7 @@ describe('search cache', () => {
       getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return [
-          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -439,7 +436,7 @@ describe('search cache', () => {
 
       // Rebuild with new data
       getDistinctPayees.mockResolvedValueOnce([
-        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '21/22', total_amount: 2000 }
+        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London' }
       ])
 
       await getSearchSuggestions('new')
@@ -451,7 +448,7 @@ describe('search cache', () => {
       getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return [
-          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -465,7 +462,7 @@ describe('search cache', () => {
 
       // Next search should rebuild
       getDistinctPayees.mockResolvedValueOnce([
-        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '21/22', total_amount: 2000 }
+        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London' }
       ])
 
       await getSearchSuggestions('new')
@@ -477,7 +474,7 @@ describe('search cache', () => {
       getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return [
-          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
@@ -496,7 +493,7 @@ describe('search cache', () => {
       // All should have waited for the same build, but it was discarded
       // Next search should trigger a new build
       getDistinctPayees.mockResolvedValueOnce([
-        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London', scheme: 'CS', financial_year: '21/22', total_amount: 2000 }
+        { payee_name: 'New', part_postcode: 'CD34', town: 'London', county_council: 'Greater London' }
       ])
 
       await getSearchSuggestions('new')
@@ -509,7 +506,7 @@ describe('search cache', () => {
       getDistinctPayees.mockImplementation(async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return [
-          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County', scheme: 'BPS', financial_year: '20/21', total_amount: 1000 }
+          { payee_name: 'Data', part_postcode: 'AB12', town: 'Town', county_council: 'County' }
         ]
       })
 
