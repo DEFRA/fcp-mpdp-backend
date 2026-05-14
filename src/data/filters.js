@@ -46,11 +46,11 @@ function groupByPayee (searchResults) {
     const key = `${item.payee_name}|${item.part_postcode}`
     const existing = map.get(key)
 
-    if (!existing) {
-      map.set(key, { ...item })
-    } else {
+    if (existing) {
       existing.total_amount =
         Number.parseFloat(existing.total_amount) + Number.parseFloat(item.total_amount)
+    } else {
+      map.set(key, { ...item })
     }
   }
 
