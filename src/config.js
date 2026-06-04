@@ -187,6 +187,34 @@ const config = convict({
       default: 3600000,
       env: 'SEARCH_CACHE_TTL'
     }
+  },
+  serviceToServiceAuth: {
+    enabled: {
+      doc: 'Enable service-to-service JWT authentication on all non-health routes',
+      format: Boolean,
+      default: false,
+      env: 'SERVICE_AUTH_ENABLED'
+    },
+    jwksUri: {
+      doc: 'JWKS endpoint URI for verifying service JWT tokens (CDP_JWT_JWKS_URI)',
+      format: String,
+      nullable: true,
+      default: null,
+      env: 'CDP_JWT_JWKS_URI'
+    },
+    issuer: {
+      doc: 'Expected JWT issuer (CDP_JWT_ISSUER)',
+      format: String,
+      nullable: true,
+      default: null,
+      env: 'CDP_JWT_ISSUER'
+    },
+    audience: {
+      doc: 'Expected JWT audience - should match the service name',
+      format: String,
+      default: 'fcp-mpdp-backend',
+      env: 'SERVICE_AUTH_AUDIENCE'
+    }
   }
 })
 
