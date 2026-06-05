@@ -141,6 +141,15 @@ describe('service-auth plugin', () => {
       expect(result.isValid).toBe(true)
     })
 
+    test('validate callback should reject a token with no sub claim', async () => {
+      await serviceAuth.plugin.register(mockServer)
+      const strategyOptions = mockServer.auth.strategy.mock.calls[0][2]
+      const result = strategyOptions.validate({
+        decoded: { payload: {} }
+      })
+      expect(result).toEqual({ isValid: false })
+    })
+
     describe('when allowedServices is configured', () => {
       beforeEach(() => {
         mockConfigGet.mockImplementation((key) => {

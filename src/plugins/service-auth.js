@@ -37,7 +37,13 @@ const serviceAuth = {
         },
         validate: (artifacts) => {
           const sub = artifacts.decoded.payload.sub
-          const serviceName = sub?.split('/').pop()
+
+          if (!sub) {
+            logger.warn('Service-to-service auth rejected: missing sub claim')
+            return { isValid: false }
+          }
+
+          const serviceName = sub.split('/').pop()
 
           if (allowedServices.length > 0 && !allowedServices.includes(serviceName)) {
             logger.warn({ sub, serviceName }, 'Service-to-service auth rejected: service not in allowed list')
