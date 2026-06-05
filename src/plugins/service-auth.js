@@ -8,20 +8,20 @@ const serviceAuth = {
   plugin: {
     name: 'service-auth',
     register: async (server) => {
-      if (!config.get('serviceToServiceAuth.enabled')) {
+      if (!config.get('serviceAuth.enabled')) {
         logger.info('Service-to-service authentication is disabled')
         return
       }
 
-      const jwksUri = config.get('serviceToServiceAuth.jwksUri')
-      const issuer = config.get('serviceToServiceAuth.issuer')
-      const audience = config.get('serviceToServiceAuth.audience')
+      const jwksUri = config.get('serviceAuth.jwksUri')
+      const issuer = config.get('serviceAuth.issuer')
+      const audience = config.get('serviceAuth.audience')
 
       logger.info('Registering service-to-service JWT authentication')
 
       await server.register(Jwt)
 
-      const allowedServices = config.get('serviceToServiceAuth.allowedServices')
+      const allowedServices = config.get('serviceAuth.allowedServices')
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean)

@@ -47,7 +47,7 @@ describe('service-auth plugin', () => {
   describe('when service-to-service auth is disabled', () => {
     beforeEach(() => {
       mockConfigGet.mockImplementation((key) => {
-        if (key === 'serviceToServiceAuth.enabled') return false
+        if (key === 'serviceAuth.enabled') return false
         return null
       })
     })
@@ -71,11 +71,11 @@ describe('service-auth plugin', () => {
   describe('when service-to-service auth is enabled', () => {
     beforeEach(() => {
       mockConfigGet.mockImplementation((key) => {
-        if (key === 'serviceToServiceAuth.enabled') return true
-        if (key === 'serviceToServiceAuth.jwksUri') return 'https://test-jwks.example.com'
-        if (key === 'serviceToServiceAuth.issuer') return 'https://test-issuer.example.com'
-        if (key === 'serviceToServiceAuth.audience') return 'fcp-mpdp-backend'
-        if (key === 'serviceToServiceAuth.allowedServices') return ''
+        if (key === 'serviceAuth.enabled') return true
+        if (key === 'serviceAuth.jwksUri') return 'https://test-jwks.example.com'
+        if (key === 'serviceAuth.issuer') return 'https://test-issuer.example.com'
+        if (key === 'serviceAuth.audience') return 'fcp-mpdp-backend'
+        if (key === 'serviceAuth.allowedServices') return ''
         return null
       })
     })
@@ -144,11 +144,11 @@ describe('service-auth plugin', () => {
     describe('when allowedServices is configured', () => {
       beforeEach(() => {
         mockConfigGet.mockImplementation((key) => {
-          if (key === 'serviceToServiceAuth.enabled') return true
-          if (key === 'serviceToServiceAuth.jwksUri') return 'https://test-jwks.example.com'
-          if (key === 'serviceToServiceAuth.issuer') return 'https://test-issuer.example.com'
-          if (key === 'serviceToServiceAuth.audience') return 'fcp-mpdp-backend'
-          if (key === 'serviceToServiceAuth.allowedServices') return 'fcp-mpdp-frontend,fcp-mpdp-admin'
+          if (key === 'serviceAuth.enabled') return true
+          if (key === 'serviceAuth.jwksUri') return 'https://test-jwks.example.com'
+          if (key === 'serviceAuth.issuer') return 'https://test-issuer.example.com'
+          if (key === 'serviceAuth.audience') return 'fcp-mpdp-backend'
+          if (key === 'serviceAuth.allowedServices') return 'fcp-mpdp-frontend,fcp-mpdp-admin'
           return null
         })
       })

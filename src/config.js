@@ -188,7 +188,7 @@ const config = convict({
       env: 'SEARCH_CACHE_TTL'
     }
   },
-  serviceToServiceAuth: {
+  serviceAuth: {
     enabled: {
       doc: 'Enable service-to-service JWT authentication on all non-health routes',
       format: Boolean,
