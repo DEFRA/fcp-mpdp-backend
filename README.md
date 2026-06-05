@@ -106,6 +106,26 @@ All these endpoints are documented using [hapi-swagger](https://www.npmjs.com/pa
 
 Documentation for the API can be found at [http://localhost:3001/documentation](http://localhost:3001/documentation) when running the application in development mode.
 
+## Service-to-service authentication
+
+This service optionally enforces JWT-based authentication on all routes except `/health`. This is disabled by default and intended to be enabled in deployed environments.
+
+When enabled, callers must obtain a short-lived JWT via the AWS STS `GetWebIdentityToken` API and attach it to every request as a `Bearer` token. The backend validates the token's signature (via the JWKS endpoint), issuer, and audience. It additionally restricts access to a named list of services by extracting the calling service's name from the `sub` claim, which follows the pattern `arn:aws:iam::ACCOUNT:role/SERVICE-NAME`.
+
+### Environment variables
+
+| Variable | Required when enabled | Description |
+|---|---|---|
+| `SERVICE_AUTH_ENABLED` | ✅ | Set to `true` to enable. Default: `false` |
+| `CDP_JWT_JWKS_URI` | ✅ | URL of the JWKS endpoint for verifying token signatures |
+| `CDP_JWT_ISSUER` | ✅ | Expected JWT issuer - matches `CDP_JWT_ISSUER` set on the environment |
+| `SERVICE_AUTH_AUDIENCE` | optional | Expected JWT audience. Default: `fcp-mpdp-backend` |
+| `SERVICE_AUTH_ALLOWED_SERVICES` | optional | Comma-separated list of permitted caller service names, e.g. `fcp-mpdp-frontend,fcp-mpdp-admin`. Leave empty to allow any valid JWT. |
+
+### How service identity is verified
+
+The JWT `sub` claim contains the calling service's IAM role ARN in the form `arn:aws:iam::ACCOUNT:role/SERVICE-NAME`. The service name is extracted from the end of the ARN and checked against `SERVICE_AUTH_ALLOWED_SERVICES`. Because only code running inside an ECS task with that IAM role can obtain a token signed with that `sub`, this provides application-level enforcement on top of AWS IAM controls.
+
 ## Dependabot
 
 We have added an example dependabot configuration file to the repository. You can enable it by renaming
