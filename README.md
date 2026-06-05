@@ -118,7 +118,7 @@ When enabled, callers must obtain a short-lived JWT via the AWS STS `GetWebIdent
 |---|---|---|
 | `SERVICE_AUTH_ENABLED` | ✅ | Set to `true` to enable. Default: `false` |
 | `CDP_JWT_JWKS_URI` | ✅ | URL of the JWKS endpoint for verifying token signatures |
-| `CDP_JWT_ISSUER` | ✅ | Expected JWT issuer — matches `CDP_JWT_ISSUER` set on the environment |
+| `CDP_JWT_ISSUER` | ✅ | Expected JWT issuer - matches `CDP_JWT_ISSUER` set on the environment |
 | `SERVICE_AUTH_AUDIENCE` | optional | Expected JWT audience. Default: `fcp-mpdp-backend` |
 | `SERVICE_AUTH_ALLOWED_SERVICES` | optional | Comma-separated list of permitted caller service names, e.g. `fcp-mpdp-frontend,fcp-mpdp-admin`. Leave empty to allow any valid JWT. |
 
