@@ -18,6 +18,7 @@ vi.mock('@hapi/jwt', () => ({
 vi.mock('../../../src/common/helpers/logging/logger.js', () => ({
   createLogger: vi.fn().mockReturnValue({
     info: vi.fn(),
+    warn: vi.fn(),
     error: vi.fn()
   })
 }))
@@ -74,6 +75,7 @@ describe('service-auth plugin', () => {
         if (key === 'serviceToServiceAuth.jwksUri') return 'https://test-jwks.example.com'
         if (key === 'serviceToServiceAuth.issuer') return 'https://test-issuer.example.com'
         if (key === 'serviceToServiceAuth.audience') return 'fcp-mpdp-backend'
+        if (key === 'serviceToServiceAuth.allowedServices') return ''
         return null
       })
     })
@@ -125,6 +127,58 @@ describe('service-auth plugin', () => {
       expect(result).toEqual({
         isValid: true,
         credentials: { sub: 'arn:aws:iam::123456789012:role/fcp-mpdp-frontend' }
+      })
+    })
+
+    test('validate callback should accept any service when allowedServices is empty', async () => {
+      await serviceAuth.plugin.register(mockServer)
+      const strategyOptions = mockServer.auth.strategy.mock.calls[0][2]
+      const result = strategyOptions.validate({
+        decoded: {
+          payload: { sub: 'arn:aws:iam::123456789012:role/some-other-service' }
+        }
+      })
+      expect(result.isValid).toBe(true)
+    })
+
+    describe('when allowedServices is configured', () => {
+      beforeEach(() => {
+        mockConfigGet.mockImplementation((key) => {
+          if (key === 'serviceToServiceAuth.enabled') return true
+          if (key === 'serviceToServiceAuth.jwksUri') return 'https://test-jwks.example.com'
+          if (key === 'serviceToServiceAuth.issuer') return 'https://test-issuer.example.com'
+          if (key === 'serviceToServiceAuth.audience') return 'fcp-mpdp-backend'
+          if (key === 'serviceToServiceAuth.allowedServices') return 'fcp-mpdp-frontend,fcp-mpdp-admin'
+          return null
+        })
+      })
+
+      test('validate callback should accept a service in the allowed list', async () => {
+        await serviceAuth.plugin.register(mockServer)
+        const strategyOptions = mockServer.auth.strategy.mock.calls[0][2]
+        const result = strategyOptions.validate({
+          decoded: {
+            payload: { sub: 'arn:aws:iam::123456789012:role/fcp-mpdp-admin' }
+          }
+        })
+        expect(result).toEqual({
+          isValid: true,
+          credentials: { sub: 'arn:aws:iam::123456789012:role/fcp-mpdp-admin' }
+        })
+      })
+
+      test('validate callback should reject a service not in the allowed list', async () => {
+        await serviceAuth.plugin.register(mockServer)
+        const strategyOptions = mockServer.auth.strategy.mock.calls[0][2]
+        const result = strategyOptions.validate({
+          decoded: {
+            payload: { sub: 'arn:aws:iam::123456789012:role/some-other-service' }
+          }
+        })
+        expect(result).toEqual({
+          isValid: false,
+          credentials: { sub: 'arn:aws:iam::123456789012:role/some-other-service' }
+        })
       })
     })
   })

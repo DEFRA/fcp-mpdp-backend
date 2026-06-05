@@ -214,6 +214,12 @@ const config = convict({
       format: String,
       default: 'fcp-mpdp-backend',
       env: 'SERVICE_AUTH_AUDIENCE'
+    },
+    allowedServices: {
+      doc: 'Comma-separated list of service names permitted to call this API (e.g. fcp-mpdp-frontend,fcp-mpdp-admin). Leave empty to allow any valid JWT.',
+      format: String,
+      default: '',
+      env: 'SERVICE_AUTH_ALLOWED_SERVICES'
     }
   }
 })

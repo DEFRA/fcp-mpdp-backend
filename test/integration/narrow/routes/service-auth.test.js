@@ -11,15 +11,19 @@ vi.mock('@hapi/jwt', () => ({
     plugin: {
       name: 'jwt',
       register: (server) => {
-        server.auth.scheme('jwt', (_server, _options) => ({
+        server.auth.scheme('jwt', (_server, options) => ({
           authenticate: (request, h) => {
             const auth = request.headers.authorization
             if (!auth?.startsWith('Bearer ')) {
               throw Boom.unauthorized(null, 'Bearer')
             }
-            return h.authenticated({
-              credentials: { sub: 'arn:aws:iam::123456789012:role/fcp-mpdp-frontend' }
-            })
+            const sub = request.headers['x-test-sub'] ?? 'arn:aws:iam::123456789012:role/fcp-mpdp-frontend'
+            const artifacts = { decoded: { payload: { sub } } }
+            const { isValid, credentials } = options.validate(artifacts)
+            if (!isValid) {
+              throw Boom.unauthorized('Service not allowed', 'Bearer')
+            }
+            return h.authenticated({ credentials })
           }
         }))
       }
@@ -33,6 +37,7 @@ vi.mock('../../../../src/data/payments.js')
 process.env.SERVICE_AUTH_ENABLED = 'true'
 process.env.CDP_JWT_JWKS_URI = 'https://test-jwks.example.com'
 process.env.CDP_JWT_ISSUER = 'https://test-issuer.example.com'
+process.env.SERVICE_AUTH_ALLOWED_SERVICES = 'fcp-mpdp-frontend,fcp-mpdp-admin'
 
 const { getPaymentData, getSearchSuggestions } = await import('../../../../src/data/search.js')
 const { getAllPaymentsCsvStream, getPaymentsCsv } = await import('../../../../src/data/payments.js')
@@ -110,5 +115,23 @@ describe('service-auth - auth enabled', () => {
       headers: { authorization: 'Bearer valid-test-token' }
     })
     expect(response.statusCode).toBe(200)
+  })
+
+  test('POST /v1/payments should return 401 when the calling service is not in the allowed list', async () => {
+    const response = await server.inject({
+      method: 'POST',
+      url: '/v1/payments',
+      payload: {
+        searchString: 'test',
+        limit: 10,
+        offset: 0,
+        sortBy: 'score'
+      },
+      headers: {
+        authorization: 'Bearer valid-test-token',
+        'x-test-sub': 'arn:aws:iam::123456789012:role/some-other-service'
+      }
+    })
+    expect(response.statusCode).toBe(401)
   })
 })

@@ -21,6 +21,11 @@ const serviceAuth = {
 
       await server.register(Jwt)
 
+      const allowedServices = config.get('serviceToServiceAuth.allowedServices')
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+
       server.auth.strategy('service', 'jwt', {
         keys: {
           uri: jwksUri
@@ -30,12 +35,17 @@ const serviceAuth = {
           iss: issuer,
           sub: false
         },
-        validate: (artifacts) => ({
-          isValid: true,
-          credentials: {
-            sub: artifacts.decoded.payload.sub
+        validate: (artifacts) => {
+          const sub = artifacts.decoded.payload.sub
+          const serviceName = sub?.split('/').pop()
+
+          if (allowedServices.length > 0 && !allowedServices.includes(serviceName)) {
+            logger.warn({ sub, serviceName }, 'Service-to-service auth rejected: service not in allowed list')
+            return { isValid: false, credentials: { sub } }
           }
-        })
+
+          return { isValid: true, credentials: { sub } }
+        }
       })
 
       server.auth.default('service')
