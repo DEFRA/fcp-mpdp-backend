@@ -48,7 +48,7 @@
     "fuse.js": "7.1.0",
     "global-agent": "3.0.0",
     "hapi-pino": "13.0.0",
-    "hapi-pulse": "3.0.1",
+    "hapi-pulse": "4.0.0",
     "hapi-swagger": "17.2.1",
     "joi": "17.13.3",
     "pg": "8.16.3",
