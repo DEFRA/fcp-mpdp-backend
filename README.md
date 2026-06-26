@@ -8,7 +8,7 @@
 
 # fcp-mpdp-backend
 
-Backend API for the Making Payment Data Public (MPDP) service.
+Backend API for the Making Payment Data Public (MPDP) service. 
 
 MPDP is part of the Farming and Countryside Programme (FCP).
 
