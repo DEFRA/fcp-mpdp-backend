@@ -1,6 +1,8 @@
 .DS_Store
 .npm/
-.vscode
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
 .idea
 .server
 node_modules

@@ -5,6 +5,7 @@ import { paymentsSummary } from '../routes/payments-summary.js'
 import { paymentsPayee } from '../routes/payments-payee.js'
 import { paymentsAdmin } from '../routes/payments-admin.js'
 import { paymentsSummaryAdmin } from '../routes/payments-summary-admin.js'
+import { cacheAdmin } from '../routes/cache-admin.js'
 
 const router = {
   plugin: {
@@ -13,6 +14,7 @@ const router = {
       server.route(
         [].concat(
           health,
+          cacheAdmin,
           paymentsAdmin,
           paymentsSummaryAdmin,
           payments,
