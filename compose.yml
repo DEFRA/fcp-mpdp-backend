@@ -1,6 +1,5 @@
 services:
   fcp-mpdp-backend:
-    init: true
     build:
       context: .
       target: development
