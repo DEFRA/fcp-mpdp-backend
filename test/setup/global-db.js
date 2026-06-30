@@ -29,7 +29,7 @@ export async function setup () {
       '--changelog-file=changelog/db.changelog.xml',
       'update'
     ])
-    .withWaitStrategy(Wait.forOnMessage('Liquibase command \'update\' successfully executed'))
+    .withWaitStrategy(Wait.forLogMessage('Liquibase command \'update\' successfully executed'))
     .start()
 
   process.env.POSTGRES_HOST = postgres.getHost()
