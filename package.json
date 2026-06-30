@@ -5,25 +5,25 @@
   "main": "src/index.js",
   "type": "module",
   "engines": {
-    "node": ">=22.16.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
     "dev": "NODE_ENV=development npm run server:watch",
     "dev:debug": "NODE_ENV=development npm run server:debug",
     "docker:build": "docker compose build",
     "docker:dev": "docker compose up",
+    "docker:test": "npm run lint && mkdir -p coverage 2>/dev/null || true && docker compose -p fcp-mpdp-backend-test down -v && docker compose -f compose.yml -f compose.test.yml -p fcp-mpdp-backend-test run --build --rm fcp-mpdp-backend",
+    "docker:test:watch": "docker compose -p fcp-mpdp-backend-test down -v && docker compose -f compose.yml -f compose.test.yml -f compose.test.watch.yml -p fcp-mpdp-backend-test run --build --rm fcp-mpdp-backend",
     "git:pre-commit-hook": "npm run lint:fix",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "postinstall": "npm run setup:husky",
-    "server:debug": "nodemon --inspect-brk=0.0.0.0 --ext js,json --legacy-watch ./src",
-    "server:watch": "nodemon --inspect=0.0.0.0 --ext js,json --legacy-watch ./src",
+    "server:debug": "node --watch --watch-path=./src --inspect-brk=0.0.0.0 src/index.js",
+    "server:watch": "node --watch --watch-path=./src --inspect=0.0.0.0 src/index.js",
     "setup:husky": "node -e \"try { (await import('husky')).default() } catch (e) { if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e }\" --input-type module",
-    "start": "NODE_ENV=production node --use-strict .",
+    "start": "NODE_ENV=production node .",
     "test": "TZ=UTC vitest run --coverage",
-    "test:watch": "TZ=UTC vitest",
-    "docker:test": "npm run lint && mkdir -p coverage 2>/dev/null || true && docker compose -p fcp-mpdp-backend-test down -v && docker compose -f compose.yml -f compose.test.yml -p fcp-mpdp-backend-test run --build --rm fcp-mpdp-backend",
-    "docker:test:watch": "docker compose -p fcp-mpdp-backend-test down -v && docker compose -f compose.yml -f compose.test.yml -f compose.test.watch.yml -p fcp-mpdp-backend-test run --build --rm fcp-mpdp-backend"
+    "test:watch": "TZ=UTC vitest"
   },
   "author": "Defra DDTS",
   "contributors": [
@@ -62,7 +62,6 @@
     "eslint": "9.29.0",
     "husky": "9.1.7",
     "neostandard": "0.12.1",
-    "nodemon": "3.1.10",
     "vitest": "4.1.4"
   }
 }

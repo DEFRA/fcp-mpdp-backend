@@ -2,6 +2,7 @@ services:
   fcp-mpdp-backend:
     ports:
       - '3001:3001'
+      - '9001:9229'
     networks:
       - fcp-mpdp
 
