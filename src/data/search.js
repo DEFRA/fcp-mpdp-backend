@@ -99,7 +99,8 @@ async function getFuseInstance () {
     const newInstance = new Fuse(payments, options)
 
     // Only set cache if token hasn't changed (not invalidated during build)
-    if (cacheToken === buildToken) {
+    // and data is not empty — avoid caching a stale empty index on startup
+    if (cacheToken === buildToken && payments.length > 0) {
       fuseInstance = newInstance
       lastCacheTime = buildStartTime
     }
@@ -139,7 +140,8 @@ async function getAutocompleteFuseInstance () {
 
     const newInstance = new Fuse(payees, options)
 
-    if (autocompleteCacheToken === buildToken) {
+    // Only cache if data is not empty — avoid caching a stale empty index on startup
+    if (autocompleteCacheToken === buildToken && payees.length > 0) {
       autocompleteFuseInstance = newInstance
       autocompleteLastCacheTime = buildStartTime
     }

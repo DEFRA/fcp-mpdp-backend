@@ -3,7 +3,7 @@ import { describe, test, beforeEach, vi, expect } from 'vitest'
 vi.mock('../../../../src/config.js', () => ({
   config: {
     get: vi.fn((key) => {
-      if (key === 'search.cacheTtl') return 0 // Disable caching for integration tests
+      if (key === 'search.cacheTtl') { return 0 } // Disable caching for integration tests
       return null
     })
   }

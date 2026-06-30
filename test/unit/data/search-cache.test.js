@@ -3,7 +3,7 @@ import { describe, test, beforeEach, afterEach, vi, expect } from 'vitest'
 vi.mock('../../../src/config.js', () => ({
   config: {
     get: vi.fn((key) => {
-      if (key === 'search.cacheTtl') return 120000 // 2 minutes default
+      if (key === 'search.cacheTtl') { return 120000 } // 2 minutes default
       return null
     })
   }
@@ -12,10 +12,10 @@ vi.mock('../../../src/config.js', () => ({
 vi.mock('../../../src/data/database.js')
 
 const { config } = await import('../../../src/config.js')
-const { getDistinctPayees } = await import('../../../src/data/database.js')
+const { getDistinctPayees, getAllPayments } = await import('../../../src/data/database.js')
 
 // Need to import after mocks are set up
-let getSearchSuggestions, invalidateSearchCache
+let getSearchSuggestions, invalidateSearchCache, warmSearchCache
 
 describe('search cache', () => {
   beforeEach(async () => {
@@ -27,14 +27,19 @@ describe('search cache', () => {
     const searchModule = await import('../../../src/data/search.js')
     getSearchSuggestions = searchModule.getSearchSuggestions
     invalidateSearchCache = searchModule.invalidateSearchCache
+    warmSearchCache = searchModule.warmSearchCache
 
     getDistinctPayees.mockResolvedValue([
       { payee_name: 'Test Payee 1', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol' },
       { payee_name: 'Test Payee 2', part_postcode: 'DE45 6FG', town: 'London', county_council: 'Greater London' }
     ])
 
+    getAllPayments.mockResolvedValue([
+      { payee_name: 'Test Payee 1', part_postcode: 'AB12 3CD', town: 'Bristol', county_council: 'Bristol', scheme: 'Test', financial_year: '2023/24' }
+    ])
+
     config.get.mockImplementation((key) => {
-      if (key === 'search.cacheTtl') return 120000
+      if (key === 'search.cacheTtl') { return 120000 }
       return null
     })
   })
@@ -75,7 +80,7 @@ describe('search cache', () => {
     test('should rebuild cache after TTL expires', async () => {
       // Set very short TTL
       config.get.mockImplementation((key) => {
-        if (key === 'search.cacheTtl') return 100 // 100ms
+        if (key === 'search.cacheTtl') { return 100 } // 100ms
         return null
       })
 
@@ -96,7 +101,7 @@ describe('search cache', () => {
 
     test('should use cache when within TTL window', async () => {
       config.get.mockImplementation((key) => {
-        if (key === 'search.cacheTtl') return 5000 // 5 seconds
+        if (key === 'search.cacheTtl') { return 5000 } // 5 seconds
         return null
       })
 
@@ -159,7 +164,7 @@ describe('search cache', () => {
   describe('Cache disabled (TTL = 0)', () => {
     test('should not cache when TTL is 0', async () => {
       config.get.mockImplementation((key) => {
-        if (key === 'search.cacheTtl') return 0
+        if (key === 'search.cacheTtl') { return 0 }
         return null
       })
 
@@ -321,7 +326,7 @@ describe('search cache', () => {
 
     test('should not have race condition with TTL check during slow build', async () => {
       config.get.mockImplementation((key) => {
-        if (key === 'search.cacheTtl') return 5000 // 5 second TTL
+        if (key === 'search.cacheTtl') { return 5000 } // 5 second TTL
         return null
       })
 
@@ -519,6 +524,56 @@ describe('search cache', () => {
 
       // Should only have built cache once
       expect(getDistinctPayees).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('Empty data — do not cache', () => {
+    test('should not cache autocomplete index when getDistinctPayees returns empty', async () => {
+      getDistinctPayees.mockResolvedValue([])
+
+      await getSearchSuggestions('test')
+      await getSearchSuggestions('test')
+
+      // Cache was not stored so DB is queried on every call
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
+    })
+
+    test('should cache autocomplete index once data becomes available after empty start', async () => {
+      getDistinctPayees
+        .mockResolvedValueOnce([]) // first call: empty → not cached
+        .mockResolvedValue([       // subsequent calls: data → cached
+          { payee_name: 'Test Payee', part_postcode: 'AB12', town: 'Bristol', county_council: 'Bristol' }
+        ])
+
+      await getSearchSuggestions('test') // empty, not cached
+      await getSearchSuggestions('test') // data, now cached
+      await getSearchSuggestions('test') // cache hit
+
+      expect(getDistinctPayees).toHaveBeenCalledTimes(2)
+    })
+
+    test('should not cache full search index when getAllPayments returns empty', async () => {
+      getAllPayments.mockResolvedValue([])
+
+      await warmSearchCache()
+      await warmSearchCache()
+
+      // Cache was not stored so DB is queried on every warmSearchCache call
+      expect(getAllPayments).toHaveBeenCalledTimes(2)
+    })
+
+    test('should cache full search index once data becomes available after empty start', async () => {
+      getAllPayments
+        .mockResolvedValueOnce([]) // first call: empty → not cached
+        .mockResolvedValue([       // subsequent calls: data → cached
+          { payee_name: 'Test Payee', part_postcode: 'AB12', town: 'Bristol', county_council: 'Bristol', scheme: 'Test', financial_year: '2023/24' }
+        ])
+
+      await warmSearchCache() // empty, not cached
+      await warmSearchCache() // data, now cached
+      await warmSearchCache() // cache hit
+
+      expect(getAllPayments).toHaveBeenCalledTimes(2)
     })
   })
 })
