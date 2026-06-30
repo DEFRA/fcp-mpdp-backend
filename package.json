@@ -25,7 +25,7 @@
     "start": "NODE_ENV=production node .",
     "test": "TZ=UTC vitest run --coverage",
     "test:watch": "TZ=UTC vitest",
-    "test:debug": "TZ=UTC vitest --inspect-brk=0.0.0.0:9229 --no-file-parallelism"
+    "test:debug": "TZ=UTC vitest --inspect=0.0.0.0:9229 --no-file-parallelism"
   },
   "author": "Defra DDTS",
   "contributors": [
