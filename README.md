@@ -75,6 +75,12 @@ Run locally with hot reload:
 npm run dev
 ```
 
+Or do both in one command:
+
+```bash
+npm run local
+```
+
 To run the full system together inside Docker (e.g. for journey tests), use:
 
 ```bash

@@ -19,6 +19,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           include: ['test/unit/**/*.test.js'],
+          clearMocks: true,
           environment: 'node',
           env: {
             NODE_ENV: 'test'
@@ -29,6 +30,7 @@ export default defineConfig({
         test: {
           name: 'integration',
           include: ['test/integration/**/*.test.js'],
+          clearMocks: true,
           environment: 'node',
           globalSetup: ['./test/setup/global-db.js']
         }

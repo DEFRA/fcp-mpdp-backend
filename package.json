@@ -14,7 +14,7 @@
     "docker:dev": "docker compose --profile app up",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "services:up": "docker compose up -d",
+    "local": "npm run services:up && npm run dev",
     "services:down": "docker compose down",
     "start": "NODE_ENV=production node .",
     "test": "cross-env TZ=UTC vitest run --coverage",
