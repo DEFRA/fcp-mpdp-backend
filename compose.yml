@@ -1,5 +1,7 @@
 services:
   fcp-mpdp-backend:
+    profiles:
+      - app
     build:
       context: .
       target: development
