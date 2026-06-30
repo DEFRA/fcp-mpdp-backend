@@ -24,7 +24,8 @@
     "setup:husky": "node -e \"try { (await import('husky')).default() } catch (e) { if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e }\" --input-type module",
     "start": "NODE_ENV=production node .",
     "test": "TZ=UTC vitest run --coverage",
-    "test:watch": "TZ=UTC vitest"
+    "test:watch": "TZ=UTC vitest",
+    "test:debug": "TZ=UTC vitest --inspect-brk=0.0.0.0:9229 --no-file-parallelism"
   },
   "author": "Defra DDTS",
   "contributors": [
