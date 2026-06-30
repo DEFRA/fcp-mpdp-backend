@@ -13,7 +13,7 @@ REST API backend for Making Payment Data Public (MPDP) service. Provides payment
 - Health check at `/health`
 
 ### Core Technology Stack
-- **Runtime:** Node.js 22+ with ES modules (`"type": "module"`)
+- **Runtime:** Node.js 24+ with ES modules (`"type": "module"`)
 - **Framework:** Hapi.js 21 for REST API
 - **Database:** PostgreSQL 16 with Knex query builder
 - **Migrations:** Liquibase XML changelogs
@@ -167,6 +167,7 @@ cd ../fcp-mpdp-core
 ```bash
 npm run docker:test          # Runs tests with Postgres container
 npm run docker:test:watch    # TDD mode
+npm run docker:test:debug    # Debug tests (attach via .vscode launch config)
 ```
 - Integration tests require PostgreSQL (via Docker compose)
 - Tests run with `TZ=UTC` for consistency
@@ -182,6 +183,11 @@ cd ../fcp-mpdp-core
 - Includes test data for journey test suite
 
 ### Debugging
+Debug inside Docker using the VS Code launch configs in [.vscode/launch.json](../.vscode/launch.json):
+- Run `npm run docker:dev`, then attach with **Docker: Attach to App**
+- Run `npm run docker:test:debug`, then attach with **Docker: Attach to Tests**
+
+Or debug locally outside Docker:
 ```bash
 npm run dev:debug            # Debugger on 0.0.0.0:9229
 ```
