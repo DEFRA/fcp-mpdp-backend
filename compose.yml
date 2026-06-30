@@ -25,7 +25,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: fcp_mpdp_backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fcp_mpdp_backend"]
       interval: 10s
       retries: 5
       start_period: 1s
