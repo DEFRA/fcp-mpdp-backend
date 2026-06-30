@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Docker: Attach to App",
+      "type": "node",
+      "request": "attach",
+      "address": "localhost",
+      "port": 9001,
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/home/node",
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Docker: Attach to Tests",
+      "type": "node",
+      "request": "attach",
+      "address": "localhost",
+      "port": 9001,
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/home/node",
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

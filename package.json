@@ -14,6 +14,7 @@
     "docker:dev": "docker compose up",
     "docker:test": "npm run lint && mkdir -p coverage 2>/dev/null || true && docker compose -p fcp-mpdp-backend-test down -v && docker compose -f compose.yml -f compose.test.yml -p fcp-mpdp-backend-test run --build --rm fcp-mpdp-backend",
     "docker:test:watch": "docker compose -p fcp-mpdp-backend-test down -v && docker compose -f compose.yml -f compose.test.yml -f compose.test.watch.yml -p fcp-mpdp-backend-test run --build --rm fcp-mpdp-backend",
+    "docker:test:debug": "docker compose -p fcp-mpdp-backend-test down -v && docker compose -f compose.yml -f compose.test.yml -f compose.test.debug.yml -p fcp-mpdp-backend-test up --build",
     "git:pre-commit-hook": "npm run lint:fix",
     "lint": "eslint",
     "lint:fix": "eslint --fix",

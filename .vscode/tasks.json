@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Docker: Dev",
+      "detail": "Build and run the app with hot reload (attach with 'Docker: Attach to App')",
+      "type": "npm",
+      "script": "docker:dev",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Test",
+      "detail": "Run all tests once with coverage",
+      "type": "npm",
+      "script": "docker:test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Test (watch)",
+      "detail": "Run tests in watch mode",
+      "type": "npm",
+      "script": "docker:test:watch",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Test (debug)",
+      "detail": "Run tests paused for the debugger (attach with 'Docker: Attach to Tests')",
+      "type": "npm",
+      "script": "docker:test:debug",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}
