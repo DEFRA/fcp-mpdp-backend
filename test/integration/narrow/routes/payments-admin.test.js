@@ -21,7 +21,8 @@ const {
   deletePaymentsByPublishedDate,
   getFinancialYears,
   bulkUploadPayments,
-  bulkSetPublishedDate
+  bulkSetPublishedDate,
+  getPaymentsByPublishedDateTotals
 } = await import('../../../../src/data/payments-admin.js')
 
 const { createServer } = await import('../../../../src/server.js')
@@ -486,6 +487,64 @@ describe('payments admin routes', () => {
 
       const response = await server.inject(options)
       expect(response.statusCode).toBe(400)
+    })
+  })
+
+  describe('GET /v1/payments/admin/payments/published-date-totals', () => {
+    test('should return 200 with grouped totals', async () => {
+      const mockTotals = [
+        { published_date: '2024-01-15', financial_year: '2023/24', count: '50' },
+        { published_date: '2024-01-15', financial_year: '2022/23', count: '30' },
+        { published_date: '2024-02-20', financial_year: '2023/24', count: '100' },
+        { published_date: null, financial_year: '2022/23', count: '10' }
+      ]
+      getPaymentsByPublishedDateTotals.mockResolvedValue(mockTotals)
+
+      const options = {
+        method: 'GET',
+        url: '/v1/payments/admin/payments/published-date-totals'
+      }
+
+      const response = await server.inject(options)
+
+      expect(response.statusCode).toBe(200)
+      expect(getPaymentsByPublishedDateTotals).toHaveBeenCalledTimes(1)
+      expect(JSON.parse(response.payload)).toEqual(mockTotals)
+    })
+
+    test('should return empty array when no payments exist', async () => {
+      getPaymentsByPublishedDateTotals.mockResolvedValue([])
+
+      const options = {
+        method: 'GET',
+        url: '/v1/payments/admin/payments/published-date-totals'
+      }
+
+      const response = await server.inject(options)
+
+      expect(response.statusCode).toBe(200)
+      expect(JSON.parse(response.payload)).toEqual([])
+    })
+
+    test('should include null published_date entries in the response', async () => {
+      const mockTotals = [
+        { published_date: null, financial_year: '2022/23', count: '10' },
+        { published_date: null, financial_year: '2023/24', count: '5' }
+      ]
+      getPaymentsByPublishedDateTotals.mockResolvedValue(mockTotals)
+
+      const options = {
+        method: 'GET',
+        url: '/v1/payments/admin/payments/published-date-totals'
+      }
+
+      const response = await server.inject(options)
+
+      expect(response.statusCode).toBe(200)
+      const payload = JSON.parse(response.payload)
+      expect(payload).toHaveLength(2)
+      expect(payload[0].published_date).toBeNull()
+      expect(payload[1].published_date).toBeNull()
     })
   })
 })
