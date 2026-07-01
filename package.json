@@ -57,12 +57,12 @@
     "undici": "7.28.0"
   },
   "devDependencies": {
-    "@testcontainers/postgresql": "10.27.0",
+    "@testcontainers/postgresql": "12.0.3",
     "@vitest/coverage-v8": "4.1.4",
     "cross-env": "7.0.3",
     "eslint": "9.29.0",
     "neostandard": "0.12.1",
-    "testcontainers": "10.27.0",
+    "testcontainers": "12.0.3",
     "vitest": "4.1.4"
   }
 }
