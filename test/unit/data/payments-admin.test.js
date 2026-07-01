@@ -20,7 +20,8 @@ const {
   deletePaymentsByYear,
   deletePaymentsByPublishedDate,
   getFinancialYears,
-  bulkUploadPayments
+  bulkUploadPayments,
+  getPaymentsByPublishedDateTotals
 } = await import('../../../src/data/payments-admin.js')
 
 describe('admin', () => {
@@ -391,6 +392,45 @@ Test Payee,SW1,London,Westminster,Greater London,BPS,not_a_number,23/24,2024-01-
         ]),
         { validate: true }
       )
+    })
+  })
+
+  describe('getPaymentsByPublishedDateTotals', () => {
+    test('should return counts grouped by published date and financial year', async () => {
+      const mockTotals = [
+        { published_date: '2024-01-15', financial_year: '2023/24', count: '50' },
+        { published_date: '2024-01-15', financial_year: '2022/23', count: '30' },
+        { published_date: '2024-02-20', financial_year: '2023/24', count: '100' },
+        { published_date: null, financial_year: '2022/23', count: '10' }
+      ]
+      models.PaymentDetail.findAll = vi.fn().mockResolvedValue(mockTotals)
+      models.PaymentDetail.sequelize = {
+        fn: vi.fn().mockReturnValue('COUNT(id)'),
+        col: vi.fn().mockReturnValue('id')
+      }
+
+      const result = await getPaymentsByPublishedDateTotals()
+
+      expect(models.PaymentDetail.findAll).toHaveBeenCalledWith(
+        expect.objectContaining({
+          group: ['published_date', 'financial_year'],
+          order: [['published_date', 'ASC'], ['financial_year', 'ASC']],
+          raw: true
+        })
+      )
+      expect(result).toEqual(mockTotals)
+    })
+
+    test('should return empty array when no payments exist', async () => {
+      models.PaymentDetail.findAll = vi.fn().mockResolvedValue([])
+      models.PaymentDetail.sequelize = {
+        fn: vi.fn().mockReturnValue('COUNT(id)'),
+        col: vi.fn().mockReturnValue('id')
+      }
+
+      const result = await getPaymentsByPublishedDateTotals()
+
+      expect(result).toEqual([])
     })
   })
 })
