@@ -5,6 +5,7 @@ convict.addFormats(convictFormatWithValidator)
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isTest = process.env.NODE_ENV === 'test'
+const isDevelopment = process.env.NODE_ENV === 'development'
 
 const config = convict({
   serviceVersion: {
@@ -91,6 +92,11 @@ const config = convict({
     format: Boolean,
     default: isProduction,
     env: 'ENABLE_METRICS'
+  },
+  isDevelopment: {
+    doc: 'If the application is running in development mode',
+    format: Boolean,
+    default: isDevelopment
   },
   tracing: {
     header: {
