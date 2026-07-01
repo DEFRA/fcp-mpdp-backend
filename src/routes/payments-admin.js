@@ -10,7 +10,8 @@ import {
   getAllPaymentsForAdmin,
   searchPaymentsForAdmin,
   bulkUploadPayments,
-  bulkSetPublishedDate
+  bulkSetPublishedDate,
+  getPaymentsByPublishedDateTotals
 } from '../data/payments-admin.js'
 
 const paymentsAdmin = [
@@ -219,7 +220,7 @@ const paymentsAdmin = [
       tags: ['api', 'admin', 'payments'],
       validate: {
         params: Joi.object({
-          publishedDate: Joi.string().isoDate().required()
+          publishedDate: Joi.date().iso().required()
         })
       }
     },
@@ -250,6 +251,19 @@ const paymentsAdmin = [
       const { published_date: publishedDate } = request.payload
       const result = await bulkSetPublishedDate(financialYear, publishedDate)
       return h.response(result)
+    }
+  },
+  {
+    method: 'GET',
+    path: '/v1/payments/admin/payments/published-date-totals',
+    options: {
+      description: 'Get payment counts grouped by published date and financial year',
+      notes: 'Returns all payment records grouped by published date and financial year with a count',
+      tags: ['api', 'admin', 'payments']
+    },
+    handler: async (_request, h) => {
+      const totals = await getPaymentsByPublishedDateTotals()
+      return h.response(totals)
     }
   }
 ]

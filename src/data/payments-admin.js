@@ -210,6 +210,23 @@ async function bulkUploadPayments (csvStream) {
   })
 }
 
+async function getPaymentsByPublishedDateTotals () {
+  const { fn, col } = models.PaymentDetail.sequelize
+  return models.PaymentDetail.findAll({
+    attributes: [
+      'published_date',
+      'financial_year',
+      [fn('COUNT', col('id')), 'count']
+    ],
+    group: ['published_date', 'financial_year'],
+    order: [
+      ['published_date', 'ASC'],
+      ['financial_year', 'ASC']
+    ],
+    raw: true
+  })
+}
+
 export {
   getPaymentById,
   createPayment,
@@ -221,5 +238,6 @@ export {
   getAllPaymentsForAdmin,
   searchPaymentsForAdmin,
   bulkUploadPayments,
-  bulkSetPublishedDate
+  bulkSetPublishedDate,
+  getPaymentsByPublishedDateTotals
 }

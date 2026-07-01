@@ -341,7 +341,7 @@ describe('payments admin routes', () => {
 
       const response = await server.inject(options)
       expect(response.statusCode).toBe(200)
-      expect(deletePaymentsByPublishedDate).toHaveBeenCalledWith('2024-01-15T00:00:00.000Z')
+      expect(deletePaymentsByPublishedDate).toHaveBeenCalledWith(new Date('2024-01-15T00:00:00.000Z'))
       expect(JSON.parse(response.payload)).toEqual(mockResult)
     })
 
@@ -358,7 +358,7 @@ describe('payments admin routes', () => {
 
       const response = await server.inject(options)
       expect(response.statusCode).toBe(200)
-      expect(deletePaymentsByPublishedDate).toHaveBeenCalledWith('2023-12-31T00:00:00.000Z')
+      expect(deletePaymentsByPublishedDate).toHaveBeenCalledWith(new Date('2023-12-31T00:00:00.000Z'))
     })
 
     test('should return 400 for invalid date format', async () => {
