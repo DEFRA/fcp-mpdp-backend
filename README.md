@@ -28,13 +28,21 @@ MPDP is part of the Farming and Countryside Programme (FCP).
 
 ## Requirements
 
+### Node.js
+
+Node.js 24 or later is required. Use [nvm](https://github.com/nvm-sh/nvm) to manage versions:
+
+```bash
+nvm use
+```
+
+> The correct version is pinned in [.nvmrc](./.nvmrc).
+
 ### Docker
 
-This application is intended to be run in a Docker container to ensure consistency across environments.
+Docker is required to run the Postgres + Liquibase dependency containers and to build the production image.
 
 Docker can be installed from [Docker's official website](https://docs.docker.com/get-docker/).
-
-> The test suite includes integration tests which are dependent on a Postgres container so cannot be run without Docker.
 
 ## Local development
 
@@ -43,38 +51,77 @@ Docker can be installed from [Docker's official website](https://docs.docker.com
 Install application dependencies:
 
 ```bash
+nvm use
 npm install
+```
+
+Copy the example environment file and fill in any values for your machine:
+
+```bash
+cp .env.example .env
 ```
 
 ### Development
 
-To run the application in `development` mode run:
+Start the Postgres + Liquibase dependency containers:
 
 ```bash
-npm run docker:dev
+npm run services:up
+```
+
+Run locally with hot reload:
+
+```bash
+npm run dev
+```
+
+Or do both in one command:
+
+```bash
+npm run local
+```
+
+To run the full system together inside Docker (e.g. for journey tests), use:
+
+```bash
+npm run docker:build  # build the image
+npm run docker:dev    # run inside Docker on the fcp-mpdp network
 ```
 
 ### Testing
 
-To test the application run:
+Tests use [Testcontainers](https://testcontainers.com/) to spin up a real Postgres instance automatically — no manual setup required. Docker must be running.
+
+Run all tests (unit + integration) with coverage:
 
 ```bash
-npm run docker:test
+npm test
 ```
 
-Tests can also be run in watch mode to support Test Driven Development (TDD):
+Run only unit tests (fast, no containers):
 
 ```bash
-npm run docker:test:watch
+npm run test:unit
+```
+
+Run only integration tests (starts Postgres + runs Liquibase migrations automatically):
+
+```bash
+npm run test:integration
+```
+
+Run in watch mode for TDD:
+
+```bash
+npm run test:watch
 ```
 
 ### Debugging
 
-VS Code launch configurations for debugging inside Docker are provided in [.vscode/launch.json](./.vscode/launch.json).
+VS Code launch configurations are in [.vscode/launch.json](./.vscode/launch.json).
 
-To debug the running application, start it with `npm run docker:dev` and then run the **Docker: Attach to App** launch configuration.
-
-To debug the tests, start them paused for the debugger with `npm run docker:test:debug` and then run the **Docker: Attach to Tests** launch configuration.
+- **Dev: run server** — launches the server locally with the inspector attached. Requires `services:up` first.
+- **Debug current test** — opens the inspector on the currently active test file. Open a test file and hit F5.
 
 ### npm scripts
 

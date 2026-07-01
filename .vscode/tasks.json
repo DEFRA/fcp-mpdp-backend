@@ -2,18 +2,33 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Docker: Dev",
-      "detail": "Build and run the app with hot reload (attach with 'Docker: Attach to App')",
+      "label": "Services: Up",
+      "detail": "Start Postgres + Liquibase dependency containers",
       "type": "npm",
-      "script": "docker:dev",
+      "script": "services:up",
       "isBackground": true,
       "problemMatcher": []
     },
     {
-      "label": "Docker: Test",
+      "label": "Services: Down",
+      "detail": "Stop dependency containers",
+      "type": "npm",
+      "script": "services:down",
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev",
+      "detail": "Run app locally with hot reload (requires Services: Up or Testcontainers)",
+      "type": "npm",
+      "script": "dev",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Test",
       "detail": "Run all tests once with coverage",
       "type": "npm",
-      "script": "docker:test",
+      "script": "test",
       "group": {
         "kind": "test",
         "isDefault": true
@@ -21,18 +36,18 @@
       "problemMatcher": []
     },
     {
-      "label": "Docker: Test (watch)",
+      "label": "Test (watch)",
       "detail": "Run tests in watch mode",
       "type": "npm",
-      "script": "docker:test:watch",
+      "script": "test:watch",
       "isBackground": true,
       "problemMatcher": []
     },
     {
-      "label": "Docker: Test (debug)",
-      "detail": "Run tests paused for the debugger (attach with 'Docker: Attach to Tests')",
+      "label": "Docker: Dev (together)",
+      "detail": "Build and run in Docker (use with fcp-mpdp-core)",
       "type": "npm",
-      "script": "docker:test:debug",
+      "script": "docker:dev",
       "isBackground": true,
       "problemMatcher": []
     }

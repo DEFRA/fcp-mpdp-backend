@@ -1,3 +1,0 @@
-services:
-  fcp-mpdp-backend:
-    command: npm run test:watch

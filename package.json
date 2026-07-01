@@ -8,21 +8,21 @@
     "node": ">=24.0.0"
   },
   "scripts": {
-    "dev": "NODE_ENV=development npm run server:watch",
-    "dev:debug": "NODE_ENV=development npm run server:debug",
-    "docker:build": "docker compose build",
-    "docker:dev": "docker compose up",
-    "docker:test": "npm run lint && mkdir -p coverage 2>/dev/null || true && docker compose -p fcp-mpdp-backend-test down -v && docker compose -f compose.yml -f compose.test.yml -p fcp-mpdp-backend-test run --build --rm fcp-mpdp-backend",
-    "docker:test:watch": "docker compose -p fcp-mpdp-backend-test down -v && docker compose -f compose.yml -f compose.test.yml -f compose.test.watch.yml -p fcp-mpdp-backend-test run --build --rm fcp-mpdp-backend",
-    "docker:test:debug": "docker compose -p fcp-mpdp-backend-test down -v && docker compose -f compose.yml -f compose.test.yml -f compose.test.debug.yml -p fcp-mpdp-backend-test up --build",
+    "dev": "NODE_ENV=development node --env-file-if-exists=.env --watch --watch-path=./src src/index.js",
+    "dev:debug": "NODE_ENV=development node --env-file-if-exists=.env --watch --watch-path=./src --inspect src/index.js",
+    "docker:build": "docker compose --profile app build",
+    "docker:dev": "docker compose --profile app up",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "server:debug": "node --watch --watch-path=./src --inspect-brk=0.0.0.0 src/index.js",
-    "server:watch": "node --watch --watch-path=./src --inspect=0.0.0.0 src/index.js",
+    "local": "npm run services:up && npm run dev",
+    "services:up": "docker compose up -d",
+    "services:down": "docker compose down",
     "start": "NODE_ENV=production node .",
-    "test": "TZ=UTC vitest run --coverage",
-    "test:watch": "TZ=UTC vitest",
-    "test:debug": "TZ=UTC vitest --inspect=0.0.0.0:9229 --no-file-parallelism"
+    "test": "cross-env TZ=UTC vitest run --coverage",
+    "test:unit": "cross-env TZ=UTC vitest run --coverage --project unit",
+    "test:integration": "cross-env TZ=UTC vitest run --coverage --project integration",
+    "test:watch": "cross-env TZ=UTC vitest",
+    "test:debug": "cross-env TZ=UTC vitest --inspect --no-file-parallelism"
   },
   "author": "Defra DDTS",
   "contributors": [
@@ -57,9 +57,12 @@
     "undici": "7.28.0"
   },
   "devDependencies": {
+    "@testcontainers/postgresql": "10.27.0",
     "@vitest/coverage-v8": "4.1.4",
+    "cross-env": "7.0.3",
     "eslint": "9.29.0",
     "neostandard": "0.12.1",
+    "testcontainers": "10.27.0",
     "vitest": "4.1.4"
   }
 }

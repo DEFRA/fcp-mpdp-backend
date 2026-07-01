@@ -143,35 +143,33 @@ Admin endpoints (authenticated):
 
 ## Development Workflow
 
-### Local Development (Standalone)
+### Local Development
 ```bash
-npm install
-npm run docker:build
-npm run docker:dev           # Runs on port 3001 with Postgres + Liquibase
+nvm use && npm install     # First-time setup
+cp .env.example .env       # Copy and fill in env vars
+npm run services:up        # Start Postgres + Liquibase containers
+npm run dev                # Host-native hot reload on port 3001
 ```
-
-Services started via docker-compose:
-- `fcp-mpdp-backend` - API server
-- `postgres` - PostgreSQL 16
-- `liquibase` - Runs migrations on startup
 
 ### Full System Development
 Use [fcp-mpdp-core](../fcp-mpdp-core) orchestration:
 ```bash
 cd ../fcp-mpdp-core
 ./build
-./start -s                   # Start and seed database with test data
+./start -s                   # Start all services and seed database
 ```
 
 ### Testing
 ```bash
-npm run docker:test          # Runs tests with Postgres container
-npm run docker:test:watch    # TDD mode
-npm run docker:test:debug    # Debug tests (attach via .vscode launch config)
+npm test                  # All tests (unit + integration) with coverage
+npm run test:unit         # Unit tests only — fast, no containers needed
+npm run test:integration  # Integration tests — auto-starts Postgres via Testcontainers
+npm run test:watch        # TDD watch mode
 ```
-- Integration tests require PostgreSQL (via Docker compose)
-- Tests run with `TZ=UTC` for consistency
-- Coverage reports to `coverage/` directory
+- Integration tests use [Testcontainers](https://testcontainers.com/) to start a real Postgres instance and run Liquibase migrations automatically. Docker must be running.
+- Tests in `test/unit/**/*.test.js` and `test/integration/**/*.test.js`
+- Vitest global setup: [test/setup/global-db.js](../test/setup/global-db.js)
+- Vitest config: [vitest.config.js](../vitest.config.js)
 
 ### Database Seeding
 Local development data generation via [fcp-mpdp-core](../fcp-mpdp-core):
@@ -183,14 +181,11 @@ cd ../fcp-mpdp-core
 - Includes test data for journey test suite
 
 ### Debugging
-Debug inside Docker using the VS Code launch configs in [.vscode/launch.json](../.vscode/launch.json):
-- Run `npm run docker:dev`, then attach with **Docker: Attach to App**
-- Run `npm run docker:test:debug`, then attach with **Docker: Attach to Tests**
+Debug locally using the VS Code launch configs in [.vscode/launch.json](../.vscode/launch.json):
+- **Dev: run server** — launches the server with the inspector. Requires `npm run services:up` first.
+- **Debug current test** — opens the inspector on the active test file. Open a test file and hit F5.
 
-Or debug locally outside Docker:
-```bash
-npm run dev:debug            # Debugger on 0.0.0.0:9229
-```
+To debug inside Docker (e.g. when running with fcp-mpdp-core), use **Docker: Attach to App (together)**.
 
 ## Database Management
 
