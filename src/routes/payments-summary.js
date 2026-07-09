@@ -1,4 +1,5 @@
 import { getPaymentSummary, getPaymentSummaryCsv } from '../data/summary.js'
+import { metricsCounter } from '../common/helpers/metrics.js'
 
 const paymentsSummary = [
   {
@@ -22,8 +23,15 @@ const paymentsSummary = [
       notes: 'Returns payment summary data as a downloadable CSV file',
       tags: ['api', 'payments']
     },
-    handler: async (_request, h) => {
+    handler: async (request, h) => {
       const paymentsCsv = await getPaymentSummaryCsv()
+
+      request.logger.info({
+        message: 'CSV download summary',
+        event: { action: 'download-summary', category: 'download' }
+      })
+      metricsCounter('CsvDownloadSummary')
+
       return h
         .response(paymentsCsv)
         .type('text/csv')

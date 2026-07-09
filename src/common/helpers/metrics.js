@@ -6,7 +6,7 @@ import {
 import { config } from '../../config.js'
 import { createLogger } from './logging/logger.js'
 
-const metricsCounter = async (metricName, value = 1) => {
+async function metricsCounter (metricName, value = 1) {
   if (!config.get('isMetricsEnabled')) {
     return
   }
@@ -25,4 +25,23 @@ const metricsCounter = async (metricName, value = 1) => {
   }
 }
 
-export { metricsCounter }
+async function metricsDuration (metricName, valueMs) {
+  if (!config.get('isMetricsEnabled')) {
+    return
+  }
+
+  try {
+    const metricsLogger = createMetricsLogger()
+    metricsLogger.putMetric(
+      metricName,
+      valueMs,
+      Unit.Milliseconds,
+      StorageResolution.Standard
+    )
+    await metricsLogger.flush()
+  } catch (err) {
+    createLogger().error(err, err.message)
+  }
+}
+
+export { metricsCounter, metricsDuration }

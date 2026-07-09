@@ -1,6 +1,7 @@
 import Joi from 'joi'
 import { getPaymentData } from '../data/search.js'
 import { getAllPaymentsCsvStream, getPaymentsCsv } from '../data/payments.js'
+import { metricsCounter } from '../common/helpers/metrics.js'
 
 const payments = [
   {
@@ -29,6 +30,19 @@ const payments = [
       },
       handler: async (request, h) => {
         const paymentData = await getPaymentData(request.payload)
+
+        request.logger.info({
+          message: 'Payment search',
+          event: { action: 'search', category: 'payment', outcome: 'success' },
+          searchTerm: request.payload.searchString,
+          resultCount: paymentData.count
+        })
+        metricsCounter('SearchRequests')
+        metricsCounter('SearchResultCount', paymentData.count)
+        if (paymentData.count === 0) {
+          metricsCounter('ZeroResultSearches')
+        }
+
         return h.response(paymentData)
       }
     }
@@ -56,6 +70,13 @@ const payments = [
       },
       handler: async (request, h) => {
         const paymentData = await getPaymentsCsv(request.payload)
+
+        request.logger.info({
+          message: 'CSV download filtered',
+          event: { action: 'download-filtered', category: 'download' }
+        })
+        metricsCounter('CsvDownloadFiltered')
+
         return h.response(paymentData)
       }
     }
@@ -68,7 +89,13 @@ const payments = [
       notes: 'Returns a CSV stream containing all payment data in the database',
       tags: ['api', 'payments']
     },
-    handler: async (_request, h) => {
+    handler: async (request, h) => {
+      request.logger.info({
+        message: 'CSV download all',
+        event: { action: 'download-all', category: 'download' }
+      })
+      metricsCounter('CsvDownloadAll')
+
       const paymentsStream = getAllPaymentsCsvStream()
       return h.response(paymentsStream)
     }

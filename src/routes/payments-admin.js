@@ -13,6 +13,7 @@ import {
   bulkSetPublishedDate,
   getPaymentsByPublishedDateTotals
 } from '../data/payments-admin.js'
+import { metricsCounter } from '../common/helpers/metrics.js'
 
 const paymentsAdmin = [
   {
@@ -89,6 +90,13 @@ const paymentsAdmin = [
     },
     handler: async (request, h) => {
       const payment = await createPayment(request.payload)
+
+      request.logger.info({
+        message: 'Payment created',
+        event: { action: 'create-payment', category: 'admin', outcome: 'success' }
+      })
+      metricsCounter('AdminPaymentCreate')
+
       return h.response(payment).code(201)
     }
   },
@@ -126,6 +134,13 @@ const paymentsAdmin = [
         return h.response({ error: 'Payment not found' }).code(404)
       }
 
+      request.logger.info({
+        message: 'Payment updated',
+        event: { action: 'update-payment', category: 'admin', outcome: 'success' },
+        paymentId: id
+      })
+      metricsCounter('AdminPaymentUpdate')
+
       return h.response(payment)
     }
   },
@@ -150,6 +165,13 @@ const paymentsAdmin = [
         return h.response({ error: 'Payment not found' }).code(404)
       }
 
+      request.logger.info({
+        message: 'Payment deleted',
+        event: { action: 'delete-payment', category: 'admin', outcome: 'success' },
+        paymentId: id
+      })
+      metricsCounter('AdminPaymentDelete')
+
       return h.response(result)
     }
   },
@@ -170,8 +192,21 @@ const paymentsAdmin = [
     handler: async (request, h) => {
       try {
         const result = await bulkUploadPayments(request.payload)
+
+        request.logger.info({
+          message: 'Bulk upload completed',
+          event: { action: 'bulk-upload', category: 'admin', outcome: 'success' },
+          recordCount: result.count
+        })
+        metricsCounter('AdminBulkUpload')
+
         return h.response(result).code(201)
       } catch (err) {
+        request.logger.info({
+          message: 'Bulk upload failed',
+          event: { action: 'bulk-upload', category: 'admin', outcome: 'failure' },
+          error: { message: err.message }
+        })
         return h.response({
           success: false,
           error: err.message
@@ -208,6 +243,14 @@ const paymentsAdmin = [
     handler: async (request, h) => {
       const { financialYear } = request.params
       const result = await deletePaymentsByYear(financialYear)
+
+      request.logger.info({
+        message: 'Payments deleted by year',
+        event: { action: 'delete-by-year', category: 'admin', outcome: 'success' },
+        financialYear
+      })
+      metricsCounter('AdminDeleteByYear')
+
       return h.response(result)
     }
   },
@@ -227,6 +270,14 @@ const paymentsAdmin = [
     handler: async (request, h) => {
       const { publishedDate } = request.params
       const result = await deletePaymentsByPublishedDate(publishedDate)
+
+      request.logger.info({
+        message: 'Payments deleted by published date',
+        event: { action: 'delete-by-published-date', category: 'admin', outcome: 'success' },
+        publishedDate
+      })
+      metricsCounter('AdminDeleteByPublishedDate')
+
       return h.response(result)
     }
   },
@@ -250,6 +301,15 @@ const paymentsAdmin = [
       const { financialYear } = request.params
       const { published_date: publishedDate } = request.payload
       const result = await bulkSetPublishedDate(financialYear, publishedDate)
+
+      request.logger.info({
+        message: 'Published date set for year',
+        event: { action: 'set-published-date', category: 'admin', outcome: 'success' },
+        financialYear,
+        publishedDate
+      })
+      metricsCounter('AdminSetPublishedDate')
+
       return h.response(result)
     }
   },

@@ -6,6 +6,7 @@ import {
   updatePaymentSummary,
   deletePaymentSummary
 } from '../data/payments-summary-admin.js'
+import { metricsCounter } from '../common/helpers/metrics.js'
 
 const paymentsSummaryAdmin = [
   {
@@ -59,6 +60,13 @@ const paymentsSummaryAdmin = [
     },
     handler: async (request, h) => {
       const summary = await createPaymentSummary(request.payload)
+
+      request.logger.info({
+        message: 'Payment summary created',
+        event: { action: 'create-summary', category: 'admin', outcome: 'success' }
+      })
+      metricsCounter('AdminSummaryCreate')
+
       return h.response(summary).code(201)
     }
   },
@@ -87,6 +95,13 @@ const paymentsSummaryAdmin = [
         return h.response({ error: 'Payment summary not found' }).code(404)
       }
 
+      request.logger.info({
+        message: 'Payment summary updated',
+        event: { action: 'update-summary', category: 'admin', outcome: 'success' },
+        summaryId: id
+      })
+      metricsCounter('AdminSummaryUpdate')
+
       return h.response(summary)
     }
   },
@@ -109,6 +124,13 @@ const paymentsSummaryAdmin = [
       if (!result) {
         return h.response({ error: 'Payment summary not found' }).code(404)
       }
+
+      request.logger.info({
+        message: 'Payment summary deleted',
+        event: { action: 'delete-summary', category: 'admin', outcome: 'success' },
+        summaryId: id
+      })
+      metricsCounter('AdminSummaryDelete')
 
       return h.response(result)
     }
