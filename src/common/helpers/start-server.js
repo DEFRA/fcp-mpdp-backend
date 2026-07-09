@@ -16,9 +16,11 @@ async function startServer () {
       `Access your backend on http://localhost:${config.get('port')}`
     )
 
-    warmSearchCache().catch((err) => {
+    try {
+      await warmSearchCache()
+    } catch (err) {
       server.logger.error(err, 'Failed to pre-warm search cache')
-    })
+    }
   } catch (err) {
     const logger = createLogger()
     logger.info('Server failed to start')
