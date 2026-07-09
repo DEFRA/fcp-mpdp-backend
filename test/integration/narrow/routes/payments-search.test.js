@@ -78,14 +78,14 @@ describe('payments-search routes', () => {
     expect(response.payload).toBe(JSON.stringify({ rows: ['search result 1', 'search result 2'] }))
   })
 
-  test('GET /v1/payments/search should return 404 if no results', async () => {
+  test('GET /v1/payments/search should return 200 if no results', async () => {
     getSearchSuggestions.mockResolvedValue({ rows: [] })
     const options = {
       method: 'GET',
       url: '/v1/payments/search?searchString=smith'
     }
     const response = await server.inject(options)
-    expect(response.statusCode).toBe(404)
+    expect(response.statusCode).toBe(200)
   })
 
   test('GET /v1/payments/search should return empty array if no results', async () => {
