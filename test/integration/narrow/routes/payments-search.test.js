@@ -45,13 +45,12 @@ vi.mock('../../../../src/data/search.js')
 const { getSearchSuggestions } = await import('../../../../src/data/search.js')
 const { createServer } = await import('../../../../src/server.js')
 
-getSearchSuggestions.mockResolvedValue({ rows: ['search result 1', 'search result 2'] })
-
 let server
 
 describe('payments-search routes', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
+    getSearchSuggestions.mockResolvedValue({ rows: ['search result 1', 'search result 2'] })
     server = await createServer()
     await server.initialize()
   })
@@ -60,77 +59,32 @@ describe('payments-search routes', () => {
     await server.stop()
   })
 
-  test('GET /v1/payments/search should return 200 if results', async () => {
-    const options = {
-      method: 'GET',
-      url: '/v1/payments/search?searchString=smith'
-    }
-    const response = await server.inject(options)
+  test('GET /v1/payments/search should return 200 and results', async () => {
+    const response = await server.inject({ method: 'GET', url: '/v1/payments/search?searchString=smith' })
     expect(response.statusCode).toBe(200)
-  })
-
-  test('GET /v1/payments/search should return search results if results', async () => {
-    const options = {
-      method: 'GET',
-      url: '/v1/payments/search?searchString=smith'
-    }
-    const response = await server.inject(options)
     expect(response.payload).toBe(JSON.stringify({ rows: ['search result 1', 'search result 2'] }))
   })
 
-  test('GET /v1/payments/search should return 200 if no results', async () => {
+  test('GET /v1/payments/search should return 200 and empty array if no results', async () => {
     getSearchSuggestions.mockResolvedValue({ rows: [] })
-    const options = {
-      method: 'GET',
-      url: '/v1/payments/search?searchString=smith'
-    }
-    const response = await server.inject(options)
+    const response = await server.inject({ method: 'GET', url: '/v1/payments/search?searchString=smith' })
     expect(response.statusCode).toBe(200)
-  })
-
-  test('GET /v1/payments/search should return empty array if no results', async () => {
-    getSearchSuggestions.mockResolvedValue({ rows: [] })
-    const options = {
-      method: 'GET',
-      url: '/v1/payments/search?searchString=smith'
-    }
-    const response = await server.inject(options)
     expect(response.payload).toBe(JSON.stringify({ rows: [] }))
   })
 
-  test('GET /v1/payments/search should return 400 if no search string', async () => {
-    const options = {
-      method: 'GET',
-      url: '/v1/payments/search'
-    }
-    const response = await server.inject(options)
+  test('GET /v1/payments/search should return 400 and error message if no search string', async () => {
+    const response = await server.inject({ method: 'GET', url: '/v1/payments/search' })
     expect(response.statusCode).toBe(400)
-  })
-
-  test('GET /v1/payments/search should return error message if no search string', async () => {
-    const options = {
-      method: 'GET',
-      url: '/v1/payments/search'
-    }
-    const response = await server.inject(options)
     expect(response.payload).toBe('ValidationError: "searchString" is required')
   })
 
   test('GET /v1/payments/search should return 400 if search string is empty', async () => {
-    const options = {
-      method: 'GET',
-      url: '/v1/payments/search?searchString='
-    }
-    const response = await server.inject(options)
+    const response = await server.inject({ method: 'GET', url: '/v1/payments/search?searchString=' })
     expect(response.statusCode).toBe(400)
   })
 
   test('GET /v1/payments/search should return 400 if search string exceeds 32 characters', async () => {
-    const options = {
-      method: 'GET',
-      url: `/v1/payments/search?searchString=${'a'.repeat(33)}`
-    }
-    const response = await server.inject(options)
+    const response = await server.inject({ method: 'GET', url: `/v1/payments/search?searchString=${'a'.repeat(33)}` })
     expect(response.statusCode).toBe(400)
   })
 })
