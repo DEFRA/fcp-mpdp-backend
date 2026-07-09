@@ -17,7 +17,7 @@ const paymentsSearch = {
     },
     handler: async (request, h) => {
       const suggestions = await getSearchSuggestions(request.query.searchString)
-      return h.response(suggestions).code(200)
+      return h.response(suggestions)
     }
   }
 }
