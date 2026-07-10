@@ -1,7 +1,7 @@
 import Joi from 'joi'
 import { getPaymentData } from '../data/search.js'
 import { getAllPaymentsCsvStream, getPaymentsCsv } from '../data/payments.js'
-import { metricsCounter } from '../common/helpers/metrics.js'
+
 
 const payments = [
   {
@@ -37,10 +37,10 @@ const payments = [
           searchTerm: request.payload.searchString,
           resultCount: paymentData.count
         })
-        metricsCounter('SearchRequests')
-        metricsCounter('SearchResultCount', paymentData.count)
+        request.metrics.counter('SearchRequests')
+        request.metrics.counter('SearchResultCount', paymentData.count)
         if (paymentData.count === 0) {
-          metricsCounter('ZeroResultSearches')
+          request.metrics.counter('ZeroResultSearches')
         }
 
         return h.response(paymentData)
@@ -75,7 +75,7 @@ const payments = [
           message: 'CSV download filtered',
           event: { action: 'download-filtered', category: 'download' }
         })
-        metricsCounter('CsvDownloadFiltered')
+        request.metrics.counter('CsvDownloadFiltered')
 
         return h.response(paymentData)
       }
@@ -94,7 +94,7 @@ const payments = [
         message: 'CSV download all',
         event: { action: 'download-all', category: 'download' }
       })
-      metricsCounter('CsvDownloadAll')
+      request.metrics.counter('CsvDownloadAll')
 
       const paymentsStream = getAllPaymentsCsvStream()
       return h.response(paymentsStream)

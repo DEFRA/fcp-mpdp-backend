@@ -1,5 +1,5 @@
 import { getPaymentSummary, getPaymentSummaryCsv } from '../data/summary.js'
-import { metricsCounter } from '../common/helpers/metrics.js'
+
 
 const paymentsSummary = [
   {
@@ -30,7 +30,7 @@ const paymentsSummary = [
         message: 'CSV download summary',
         event: { action: 'download-summary', category: 'download' }
       })
-      metricsCounter('CsvDownloadSummary')
+      request.metrics.counter('CsvDownloadSummary')
 
       return h
         .response(paymentsCsv)

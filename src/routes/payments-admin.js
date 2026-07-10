@@ -13,7 +13,7 @@ import {
   bulkSetPublishedDate,
   getPaymentsByPublishedDateTotals
 } from '../data/payments-admin.js'
-import { metricsCounter } from '../common/helpers/metrics.js'
+
 
 const paymentsAdmin = [
   {
@@ -95,7 +95,7 @@ const paymentsAdmin = [
         message: 'Payment created',
         event: { action: 'create-payment', category: 'admin', outcome: 'success' }
       })
-      metricsCounter('AdminPaymentCreate')
+      request.metrics.counter('AdminPaymentCreate')
 
       return h.response(payment).code(201)
     }
@@ -139,7 +139,7 @@ const paymentsAdmin = [
         event: { action: 'update-payment', category: 'admin', outcome: 'success' },
         paymentId: id
       })
-      metricsCounter('AdminPaymentUpdate')
+      request.metrics.counter('AdminPaymentUpdate')
 
       return h.response(payment)
     }
@@ -170,7 +170,7 @@ const paymentsAdmin = [
         event: { action: 'delete-payment', category: 'admin', outcome: 'success' },
         paymentId: id
       })
-      metricsCounter('AdminPaymentDelete')
+      request.metrics.counter('AdminPaymentDelete')
 
       return h.response(result)
     }
@@ -198,7 +198,7 @@ const paymentsAdmin = [
           event: { action: 'bulk-upload', category: 'admin', outcome: 'success' },
           recordCount: result.count
         })
-        metricsCounter('AdminBulkUpload')
+        request.metrics.counter('AdminBulkUpload')
 
         return h.response(result).code(201)
       } catch (err) {
@@ -249,7 +249,7 @@ const paymentsAdmin = [
         event: { action: 'delete-by-year', category: 'admin', outcome: 'success' },
         financialYear
       })
-      metricsCounter('AdminDeleteByYear')
+      request.metrics.counter('AdminDeleteByYear')
 
       return h.response(result)
     }
@@ -276,7 +276,7 @@ const paymentsAdmin = [
         event: { action: 'delete-by-published-date', category: 'admin', outcome: 'success' },
         publishedDate
       })
-      metricsCounter('AdminDeleteByPublishedDate')
+      request.metrics.counter('AdminDeleteByPublishedDate')
 
       return h.response(result)
     }
@@ -308,7 +308,7 @@ const paymentsAdmin = [
         financialYear,
         publishedDate
       })
-      metricsCounter('AdminSetPublishedDate')
+      request.metrics.counter('AdminSetPublishedDate')
 
       return h.response(result)
     }
