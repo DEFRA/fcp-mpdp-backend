@@ -1,3 +1,7 @@
+import { createLogger } from '../common/helpers/logging/logger.js'
+
+const logger = createLogger()
+
 function applyFiltersAndGroupByPayee (
   searchResults,
   { schemes = [], counties = [], amounts = [], years = [] }
@@ -106,7 +110,7 @@ function getUniqueFields (searchResults, field) {
 
     return result
   } catch (err) {
-    console.error(err)
+    logger.error(err, 'Failed to get unique fields')
     return []
   }
 }

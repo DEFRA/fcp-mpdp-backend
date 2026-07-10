@@ -5,6 +5,10 @@ import {
   getFilterOptions
 } from './filters.js'
 import { config } from '../config.js'
+import { createLogger } from '../common/helpers/logging/logger.js'
+import { metricsCounter, metricsDuration } from '../common/helpers/metrics.js'
+
+const logger = createLogger()
 
 const options = {
   includeScore: true,
@@ -98,12 +102,20 @@ async function getFuseInstance () {
 
     const newInstance = new Fuse(payments, options)
 
-    // Only set cache if token hasn't changed (not invalidated during build)
-    // and data is not empty — avoid caching a stale empty index on startup
     if (cacheToken === buildToken && payments.length > 0) {
       fuseInstance = newInstance
       lastCacheTime = buildStartTime
     }
+
+    const buildDuration = Date.now() - buildStartTime
+    logger.info({
+      message: 'Search cache built',
+      event: { action: 'cache-build', category: 'search' },
+      recordCount: payments.length,
+      durationMs: buildDuration
+    })
+    metricsDuration('CacheBuildDuration', buildDuration)
+    metricsCounter('CacheRecordCount', payments.length)
 
     return newInstance
   })()
@@ -171,6 +183,12 @@ function invalidateSearchCache () {
   autocompleteFuseInstance = null
   autocompleteLastCacheTime = 0
   autocompleteBuildingCache = null
+
+  logger.info({
+    message: 'Search cache invalidated',
+    event: { action: 'cache-invalidate', category: 'search' }
+  })
+  metricsCounter('CacheInvalidate')
 }
 
 async function warmSearchCache () {

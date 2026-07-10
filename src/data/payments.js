@@ -2,6 +2,9 @@ import { Readable } from 'stream'
 import { AsyncParser } from '@json2csv/node'
 import { getAllPaymentsByPage } from './database.js'
 import { getPaymentData } from './search.js'
+import { createLogger } from '../common/helpers/logging/logger.js'
+
+const logger = createLogger()
 
 async function getPaymentsCsv ({
   searchString,
@@ -71,12 +74,12 @@ function getAllPaymentsCsvStream () {
               page++
             })
             .catch((err) => {
-              console.error(err)
+              logger.error(err, 'CSV stream error')
               this.destroy(err)
             })
         })
         .catch((err) => {
-          console.error(err)
+          logger.error(err, 'CSV stream error')
           this.destroy(err)
         })
     }

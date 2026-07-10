@@ -1,7 +1,7 @@
 import { describe, beforeEach, test, expect, vi } from 'vitest'
 import { StorageResolution, Unit } from 'aws-embedded-metrics'
 import { config } from '../../../../src/config.js'
-import { metricsCounter } from '../../../../src/common/helpers/metrics.js'
+import { metricsCounter, metricsDuration } from '../../../../src/common/helpers/metrics.js'
 
 const mockPutMetric = vi.fn()
 const mockFlush = vi.fn()
@@ -87,6 +87,55 @@ describe('metrics', () => {
 
     test('Should log expected error', () => {
       expect(mockLoggerError).toHaveBeenCalledWith(Error(mockError), mockError)
+    })
+  })
+
+  describe('metricsDuration', () => {
+    describe('When metrics is not enabled', () => {
+      beforeEach(async () => {
+        config.set('isMetricsEnabled', false)
+        await metricsDuration(mockMetricsName, mockValue)
+      })
+
+      test('Should not call metric', () => {
+        expect(mockPutMetric).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('When metrics is enabled', () => {
+      beforeEach(() => {
+        config.set('isMetricsEnabled', true)
+      })
+
+      test('Should send metric with Milliseconds unit', async () => {
+        await metricsDuration(mockMetricsName, mockValue)
+
+        expect(mockPutMetric).toHaveBeenCalledWith(
+          mockMetricsName,
+          mockValue,
+          Unit.Milliseconds,
+          StorageResolution.Standard
+        )
+      })
+
+      test('Should call flush', async () => {
+        await metricsDuration(mockMetricsName, mockValue)
+        expect(mockFlush).toHaveBeenCalled()
+      })
+    })
+
+    describe('When metrics throws', () => {
+      const mockError = 'mock-duration-error'
+
+      beforeEach(async () => {
+        config.set('isMetricsEnabled', true)
+        mockFlush.mockRejectedValue(new Error(mockError))
+        await metricsDuration(mockMetricsName, mockValue)
+      })
+
+      test('Should log expected error', () => {
+        expect(mockLoggerError).toHaveBeenCalledWith(Error(mockError), mockError)
+      })
     })
   })
 })

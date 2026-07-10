@@ -1,6 +1,10 @@
 import { expect, test, describe, beforeEach, vi } from 'vitest'
 import { Readable } from 'stream'
 
+vi.mock('../../../src/common/helpers/logging/logger.js', () => ({
+  createLogger: () => ({ info: vi.fn(), error: vi.fn(), warn: vi.fn() })
+}))
+
 vi.mock('../../../src/data/database.js')
 vi.mock('../../../src/data/search.js')
 
@@ -151,6 +155,18 @@ describe('payments', () => {
       })
       expect(data).toContain('"21/22","payee name","part postcode","town","county council","parliamentary constituency","scheme","scheme detail",100')
       expect(data).toContain('"21/22","payee name","part postcode","town","county council","parliamentary constituency","scheme","scheme detail",200')
+    })
+
+    test('should emit error when database query fails', async () => {
+      getAllPaymentsByPage.mockReset()
+      getAllPaymentsByPage.mockRejectedValue(new Error('database error'))
+
+      const stream = getAllPaymentsCsvStream()
+      const error = await new Promise((resolve) => {
+        stream.on('error', resolve)
+        stream.resume()
+      })
+      expect(error.message).toBe('database error')
     })
   })
 })

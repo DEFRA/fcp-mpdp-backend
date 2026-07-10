@@ -1,4 +1,5 @@
 import { invalidateSearchCache, warmSearchCache } from '../data/search.js'
+import { metricsCounter } from '../common/helpers/metrics.js'
 
 const cacheAdmin = [
   {
@@ -11,6 +12,12 @@ const cacheAdmin = [
     },
     handler: (request, h) => {
       invalidateSearchCache()
+
+      request.logger.info({
+        message: 'Cache invalidation requested',
+        event: { action: 'cache-invalidate-request', category: 'admin', outcome: 'success' }
+      })
+      metricsCounter('AdminCacheInvalidate')
 
       warmSearchCache().catch((err) => {
         request.logger.error(err, 'Failed to rebuild search cache after invalidation')

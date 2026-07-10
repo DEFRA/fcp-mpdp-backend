@@ -1,5 +1,6 @@
 import Joi from 'joi'
 import { getSearchSuggestions } from '../data/search.js'
+import { metricsCounter } from '../common/helpers/metrics.js'
 
 const paymentsSearch = {
   method: 'GET',
@@ -17,6 +18,14 @@ const paymentsSearch = {
     },
     handler: async (request, h) => {
       const suggestions = await getSearchSuggestions(request.query.searchString)
+
+      request.logger.info({
+        message: 'Typeahead search',
+        event: { action: 'typeahead', category: 'payment' },
+        resultCount: suggestions.count
+      })
+      metricsCounter('TypeaheadRequests')
+
       return h.response(suggestions)
     }
   }

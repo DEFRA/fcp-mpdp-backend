@@ -9,6 +9,15 @@ vi.mock('../../../../src/config.js', () => ({
   }
 }))
 
+vi.mock('../../../../src/common/helpers/logging/logger.js', () => ({
+  createLogger: () => ({ info: vi.fn(), error: vi.fn(), warn: vi.fn() })
+}))
+
+vi.mock('../../../../src/common/helpers/metrics.js', () => ({
+  metricsCounter: vi.fn(),
+  metricsDuration: vi.fn()
+}))
+
 vi.mock('../../../../src/data/database.js')
 
 const { getAllPayments, getDistinctPayees } = await import('../../../../src/data/database.js')

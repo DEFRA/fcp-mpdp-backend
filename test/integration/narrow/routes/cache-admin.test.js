@@ -33,6 +33,15 @@ vi.mock('../../../../src/config.js', () => ({
   }
 }))
 
+vi.mock('../../../../src/common/helpers/logging/logger.js', () => ({
+  createLogger: () => ({ info: vi.fn(), error: vi.fn(), warn: vi.fn() })
+}))
+
+vi.mock('../../../../src/common/helpers/metrics.js', () => ({
+  metricsCounter: vi.fn(),
+  metricsDuration: vi.fn()
+}))
+
 vi.mock('../../../../src/data/database.js', () => ({
   createModels: vi.fn(),
   healthCheck: vi.fn().mockResolvedValue(true)
@@ -95,5 +104,20 @@ describe('cache-admin routes', () => {
     // warmSearchCache is called fire-and-forget, allow microtasks to settle
     await new Promise(resolve => setImmediate(resolve))
     expect(warmSearchCache).toHaveBeenCalledTimes(1)
+  })
+
+  test('POST /v1/payments/admin/cache/invalidate should log error when warmSearchCache fails', async () => {
+    warmSearchCache.mockRejectedValue(new Error('cache rebuild failed'))
+
+    const response = await server.inject({
+      method: 'POST',
+      url: '/v1/payments/admin/cache/invalidate'
+    })
+
+    // Still returns 200 since warmSearchCache is fire-and-forget
+    expect(response.statusCode).toBe(200)
+
+    // Allow the rejected promise to settle
+    await new Promise(resolve => setImmediate(resolve))
   })
 })

@@ -1,5 +1,6 @@
 import Joi from 'joi'
 import { getPayeeDetails, getPayeeDetailsCsv } from '../data/payee.js'
+import { metricsCounter } from '../common/helpers/metrics.js'
 
 const options = {
   tags: ['api', 'payments'],
@@ -30,6 +31,12 @@ const paymentsPayee = [
         return h.response('Payee not found').code(404)
       }
 
+      request.logger.info({
+        message: 'Payee detail lookup',
+        event: { action: 'payee-detail', category: 'payment' }
+      })
+      metricsCounter('PayeeDetailRequests')
+
       return h.response(payeeDetails)
     }
   },
@@ -44,6 +51,12 @@ const paymentsPayee = [
     handler: async (request, h) => {
       const { payeeName, partPostcode } = request.params
       const payeeDetailsCsv = await getPayeeDetailsCsv(payeeName, partPostcode)
+
+      request.logger.info({
+        message: 'CSV download payee detail',
+        event: { action: 'download-payee-detail', category: 'download' }
+      })
+      metricsCounter('CsvDownloadPayeeDetail')
 
       return h
         .response(payeeDetailsCsv)
