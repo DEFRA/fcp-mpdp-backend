@@ -135,8 +135,7 @@ const paymentsAdmin = [
 
       request.logger.info({
         message: 'Payment updated',
-        event: { action: 'update-payment', category: 'admin', outcome: 'success' },
-        paymentId: id
+        event: { action: 'update-payment', category: 'admin', outcome: 'success', reference: String(id) }
       })
       request.metrics.counter('AdminPaymentUpdate')
 
@@ -166,8 +165,7 @@ const paymentsAdmin = [
 
       request.logger.info({
         message: 'Payment deleted',
-        event: { action: 'delete-payment', category: 'admin', outcome: 'success' },
-        paymentId: id
+        event: { action: 'delete-payment', category: 'admin', outcome: 'success', reference: String(id) }
       })
       request.metrics.counter('AdminPaymentDelete')
 
@@ -193,18 +191,16 @@ const paymentsAdmin = [
         const result = await bulkUploadPayments(request.payload)
 
         request.logger.info({
-          message: 'Bulk upload completed',
-          event: { action: 'bulk-upload', category: 'admin', outcome: 'success' },
-          recordCount: result.count
+          message: `Bulk upload completed count=${result.count}`,
+          event: { action: 'bulk-upload', category: 'admin', outcome: 'success' }
         })
         request.metrics.counter('AdminBulkUpload')
 
         return h.response(result).code(201)
       } catch (err) {
         request.logger.info({
-          message: 'Bulk upload failed',
-          event: { action: 'bulk-upload', category: 'admin', outcome: 'failure' },
-          error: { message: err.message }
+          message: `Bulk upload failed error="${err.message}"`,
+          event: { action: 'bulk-upload', category: 'admin', outcome: 'failure' }
         })
         return h.response({
           success: false,
@@ -244,9 +240,8 @@ const paymentsAdmin = [
       const result = await deletePaymentsByYear(financialYear)
 
       request.logger.info({
-        message: 'Payments deleted by year',
-        event: { action: 'delete-by-year', category: 'admin', outcome: 'success' },
-        financialYear
+        message: `Payments deleted by year=${financialYear}`,
+        event: { action: 'delete-by-year', category: 'admin', outcome: 'success', reference: financialYear }
       })
       request.metrics.counter('AdminDeleteByYear')
 
@@ -271,9 +266,8 @@ const paymentsAdmin = [
       const result = await deletePaymentsByPublishedDate(publishedDate)
 
       request.logger.info({
-        message: 'Payments deleted by published date',
-        event: { action: 'delete-by-published-date', category: 'admin', outcome: 'success' },
-        publishedDate
+        message: `Payments deleted by publishedDate=${publishedDate}`,
+        event: { action: 'delete-by-published-date', category: 'admin', outcome: 'success', reference: String(publishedDate) }
       })
       request.metrics.counter('AdminDeleteByPublishedDate')
 
@@ -302,10 +296,8 @@ const paymentsAdmin = [
       const result = await bulkSetPublishedDate(financialYear, publishedDate)
 
       request.logger.info({
-        message: 'Published date set for year',
-        event: { action: 'set-published-date', category: 'admin', outcome: 'success' },
-        financialYear,
-        publishedDate
+        message: `Published date set year=${financialYear} date=${publishedDate}`,
+        event: { action: 'set-published-date', category: 'admin', outcome: 'success', reference: financialYear }
       })
       request.metrics.counter('AdminSetPublishedDate')
 

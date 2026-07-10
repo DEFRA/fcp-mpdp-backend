@@ -19,9 +19,8 @@ const paymentsSearch = {
       const suggestions = await getSearchSuggestions(request.query.searchString)
 
       request.logger.info({
-        message: 'Typeahead search',
-        event: { action: 'typeahead', category: 'payment' },
-        resultCount: suggestions.count
+        message: `Typeahead search results=${suggestions.count}`,
+        event: { action: 'typeahead', category: 'payment' }
       })
       request.metrics.counter('TypeaheadRequests')
 
