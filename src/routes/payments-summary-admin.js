@@ -7,7 +7,6 @@ import {
   deletePaymentSummary
 } from '../data/payments-summary-admin.js'
 
-
 const paymentsSummaryAdmin = [
   {
     method: 'GET',

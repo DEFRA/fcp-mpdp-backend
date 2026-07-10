@@ -2,7 +2,6 @@ import Joi from 'joi'
 import { getPaymentData } from '../data/search.js'
 import { getAllPaymentsCsvStream, getPaymentsCsv } from '../data/payments.js'
 
-
 const payments = [
   {
     method: 'POST',

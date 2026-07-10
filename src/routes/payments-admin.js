@@ -14,7 +14,6 @@ import {
   getPaymentsByPublishedDateTotals
 } from '../data/payments-admin.js'
 
-
 const paymentsAdmin = [
   {
     method: 'GET',

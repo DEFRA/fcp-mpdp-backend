@@ -1,6 +1,5 @@
 import { getPaymentSummary, getPaymentSummaryCsv } from '../data/summary.js'
 
-
 const paymentsSummary = [
   {
     method: 'GET',

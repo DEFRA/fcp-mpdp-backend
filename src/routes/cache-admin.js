@@ -1,6 +1,5 @@
 import { invalidateSearchCache, warmSearchCache } from '../data/search.js'
 
-
 const cacheAdmin = [
   {
     method: 'POST',

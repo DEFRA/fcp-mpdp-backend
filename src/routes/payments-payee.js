@@ -1,7 +1,6 @@
 import Joi from 'joi'
 import { getPayeeDetails, getPayeeDetailsCsv } from '../data/payee.js'
 
-
 const options = {
   tags: ['api', 'payments'],
   validate: {

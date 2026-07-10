@@ -1,7 +1,6 @@
 import Joi from 'joi'
 import { getSearchSuggestions } from '../data/search.js'
 
-
 const paymentsSearch = {
   method: 'GET',
   path: '/v1/payments/search',
