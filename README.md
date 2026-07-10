@@ -61,6 +61,17 @@ Copy the example environment file and fill in any values for your machine:
 cp .env.example .env
 ```
 
+| Variable | Default | Description |
+|---|---|---|
+| `PORT` | `3001` | Server port |
+| `NODE_ENV` | `development` | Node environment |
+| `POSTGRES_HOST` | `localhost` | PostgreSQL host |
+| `POSTGRES_HOST_READ` | `localhost` | PostgreSQL read replica host |
+| `POSTGRES_USER` | `postgres` | PostgreSQL user |
+| `POSTGRES_PASSWORD` | `postgres` | PostgreSQL password |
+| `POSTGRES_GET_TOKEN_FROM_RDS` | `false` | Use IAM auth for RDS |
+| `AWS_EMF_ENVIRONMENT` | `Local` | Prevents metrics from connecting to CloudWatch EMF agent locally |
+
 ### Development
 
 Start the Postgres + Liquibase dependency containers:
