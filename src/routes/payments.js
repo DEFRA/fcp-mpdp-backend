@@ -31,10 +31,8 @@ const payments = [
         const paymentData = await getPaymentData(request.payload)
 
         request.logger.info({
-          message: 'Payment search',
-          event: { action: 'search', category: 'payment', outcome: 'success' },
-          searchTerm: request.payload.searchString,
-          resultCount: paymentData.count
+          message: `Payment search term="${request.payload.searchString}" results=${paymentData.count}`,
+          event: { action: 'search', category: 'payment', outcome: 'success' }
         })
         request.metrics.counter('SearchRequests')
         request.metrics.counter('SearchResultCount', paymentData.count)

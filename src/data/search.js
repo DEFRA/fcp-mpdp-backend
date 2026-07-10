@@ -109,10 +109,8 @@ async function getFuseInstance () {
 
     const buildDuration = Date.now() - buildStartTime
     logger.info({
-      message: 'Search cache built',
-      event: { action: 'cache-build', category: 'search' },
-      recordCount: payments.length,
-      durationMs: buildDuration
+      message: `Search cache built records=${payments.length} duration=${buildDuration}ms`,
+      event: { action: 'cache-build', category: 'search', duration: buildDuration * 1_000_000 }
     })
     serverMetrics.millis('CacheBuildDuration', buildDuration)
     serverMetrics.counter('CacheRecordCount', payments.length)
