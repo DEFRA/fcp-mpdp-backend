@@ -61,17 +61,6 @@ Copy the example environment file and fill in any values for your machine:
 cp .env.example .env
 ```
 
-| Variable | Default | Description |
-|---|---|---|
-| `PORT` | `3001` | Server port |
-| `NODE_ENV` | `development` | Node environment |
-| `POSTGRES_HOST` | `localhost` | PostgreSQL host |
-| `POSTGRES_HOST_READ` | `localhost` | PostgreSQL read replica host |
-| `POSTGRES_USER` | `postgres` | PostgreSQL user |
-| `POSTGRES_PASSWORD` | `postgres` | PostgreSQL password |
-| `POSTGRES_GET_TOKEN_FROM_RDS` | `false` | Use IAM auth for RDS |
-| `AWS_EMF_ENVIRONMENT` | `Local` | Prevents metrics from connecting to CloudWatch EMF agent locally |
-
 ### Development
 
 Start the Postgres + Liquibase dependency containers:
@@ -178,19 +167,29 @@ This service optionally enforces JWT-based authentication on all routes except `
 
 When enabled, callers must obtain a short-lived JWT via the AWS STS `GetWebIdentityToken` API and attach it to every request as a `Bearer` token. The backend validates the token's signature (via the JWKS endpoint), issuer, and audience. It additionally restricts access to a named list of services by extracting the calling service's name from the `sub` claim, which follows the pattern `arn:aws:iam::ACCOUNT:role/SERVICE-NAME`.
 
-### Environment variables
-
-| Variable | Required when enabled | Description |
-|---|---|---|
-| `SERVICE_AUTH_ENABLED` | ✅ | Set to `true` to enable. Default: `false` |
-| `CDP_JWT_JWKS_URI` | ✅ | URL of the JWKS endpoint for verifying token signatures |
-| `CDP_JWT_ISSUER` | ✅ | Expected JWT issuer - matches `CDP_JWT_ISSUER` set on the environment |
-| `SERVICE_AUTH_AUDIENCE` | optional | Expected JWT audience. Default: `fcp-mpdp-backend` |
-| `SERVICE_AUTH_ALLOWED_SERVICES` | optional | Comma-separated list of permitted caller service names, e.g. `fcp-mpdp-frontend,fcp-mpdp-admin`. Leave empty to allow any valid JWT. |
-
 ### How service identity is verified
 
 The JWT `sub` claim contains the calling service's IAM role ARN in the form `arn:aws:iam::ACCOUNT:role/SERVICE-NAME`. The service name is extracted from the end of the ARN and checked against `SERVICE_AUTH_ALLOWED_SERVICES`. Because only code running inside an ECS task with that IAM role can obtain a token signed with that `sub`, this provides application-level enforcement on top of AWS IAM controls.
+
+## Environment variables
+
+All variables are configured in `.env` for local development (see `.env.example`).
+
+| Variable | Default | Description |
+|---|---|---|
+| `PORT` | `3001` | Server port |
+| `NODE_ENV` | `development` | Node environment |
+| `POSTGRES_HOST` | `localhost` | PostgreSQL host |
+| `POSTGRES_HOST_READ` | `localhost` | PostgreSQL read replica host |
+| `POSTGRES_USER` | `postgres` | PostgreSQL user |
+| `POSTGRES_PASSWORD` | `postgres` | PostgreSQL password |
+| `POSTGRES_GET_TOKEN_FROM_RDS` | `false` | Use IAM auth for RDS |
+| `AWS_EMF_ENVIRONMENT` | `Local` | Prevents metrics from connecting to CloudWatch EMF agent locally |
+| `SERVICE_AUTH_ENABLED` | `false` | Enable service-to-service JWT authentication |
+| `CDP_JWT_JWKS_URI` | — | JWKS endpoint for verifying token signatures (required when auth enabled) |
+| `CDP_JWT_ISSUER` | — | Expected JWT issuer (required when auth enabled) |
+| `SERVICE_AUTH_AUDIENCE` | `fcp-mpdp-backend` | Expected JWT audience |
+| `SERVICE_AUTH_ALLOWED_SERVICES` | — | Comma-separated list of permitted caller service names |
 
 ## Dependabot
 
