@@ -1,6 +1,5 @@
 import Joi from 'joi'
 import { getPayeeDetails, getPayeeDetailsCsv } from '../data/payee.js'
-import { metricsCounter } from '../common/helpers/metrics.js'
 
 const options = {
   tags: ['api', 'payments'],
@@ -35,7 +34,7 @@ const paymentsPayee = [
         message: 'Payee detail lookup',
         event: { action: 'payee-detail', category: 'payment' }
       })
-      metricsCounter('PayeeDetailRequests')
+      request.metrics.counter('PayeeDetailRequests')
 
       return h.response(payeeDetails)
     }
@@ -56,7 +55,7 @@ const paymentsPayee = [
         message: 'CSV download payee detail',
         event: { action: 'download-payee-detail', category: 'download' }
       })
-      metricsCounter('CsvDownloadPayeeDetail')
+      request.metrics.counter('CsvDownloadPayeeDetail')
 
       return h
         .response(payeeDetailsCsv)

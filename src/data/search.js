@@ -6,7 +6,7 @@ import {
 } from './filters.js'
 import { config } from '../config.js'
 import { createLogger } from '../common/helpers/logging/logger.js'
-import { metricsCounter, metricsDuration } from '../common/helpers/metrics.js'
+import { serverMetrics } from '../common/helpers/metrics.js'
 
 const logger = createLogger()
 
@@ -114,8 +114,8 @@ async function getFuseInstance () {
       recordCount: payments.length,
       durationMs: buildDuration
     })
-    metricsDuration('CacheBuildDuration', buildDuration)
-    metricsCounter('CacheRecordCount', payments.length)
+    serverMetrics.millis('CacheBuildDuration', buildDuration)
+    serverMetrics.counter('CacheRecordCount', payments.length)
 
     return newInstance
   })()
@@ -188,7 +188,7 @@ function invalidateSearchCache () {
     message: 'Search cache invalidated',
     event: { action: 'cache-invalidate', category: 'search' }
   })
-  metricsCounter('CacheInvalidate')
+  serverMetrics.counter('CacheInvalidate')
 }
 
 async function warmSearchCache () {

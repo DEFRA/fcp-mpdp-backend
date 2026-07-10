@@ -14,8 +14,7 @@ vi.mock('../../../../src/common/helpers/logging/logger.js', () => ({
 }))
 
 vi.mock('../../../../src/common/helpers/metrics.js', () => ({
-  metricsCounter: vi.fn(),
-  metricsDuration: vi.fn()
+  serverMetrics: { counter: vi.fn(), millis: vi.fn() }
 }))
 
 vi.mock('../../../../src/data/database.js')

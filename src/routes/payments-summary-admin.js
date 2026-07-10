@@ -6,7 +6,6 @@ import {
   updatePaymentSummary,
   deletePaymentSummary
 } from '../data/payments-summary-admin.js'
-import { metricsCounter } from '../common/helpers/metrics.js'
 
 const paymentsSummaryAdmin = [
   {
@@ -65,7 +64,7 @@ const paymentsSummaryAdmin = [
         message: 'Payment summary created',
         event: { action: 'create-summary', category: 'admin', outcome: 'success' }
       })
-      metricsCounter('AdminSummaryCreate')
+      request.metrics.counter('AdminSummaryCreate')
 
       return h.response(summary).code(201)
     }
@@ -100,7 +99,7 @@ const paymentsSummaryAdmin = [
         event: { action: 'update-summary', category: 'admin', outcome: 'success' },
         summaryId: id
       })
-      metricsCounter('AdminSummaryUpdate')
+      request.metrics.counter('AdminSummaryUpdate')
 
       return h.response(summary)
     }
@@ -130,7 +129,7 @@ const paymentsSummaryAdmin = [
         event: { action: 'delete-summary', category: 'admin', outcome: 'success' },
         summaryId: id
       })
-      metricsCounter('AdminSummaryDelete')
+      request.metrics.counter('AdminSummaryDelete')
 
       return h.response(result)
     }

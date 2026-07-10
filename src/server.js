@@ -12,6 +12,7 @@ import { pulse } from './common/helpers/pulse.js'
 import { requestTracing } from './common/helpers/request-tracing.js'
 import { setupProxy } from './common/helpers/proxy/setup-proxy.js'
 import { postgres } from './common/helpers/postgres.js'
+import { metrics } from '@defra/cdp-metrics'
 
 async function createServer () {
   setupProxy()
@@ -58,6 +59,7 @@ async function createServer () {
     pulse,
     postgres,
     serviceAuth,
+    metrics,
     ...swagger,
     router
   ])
