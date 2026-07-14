@@ -82,18 +82,18 @@ describe('search', () => {
 
     test('should not offset results if action is download', async () => {
       const data = await getPaymentData({ searchString: 'payee name', limit: 1, offset: 1, sortBy: 'score', filterBy: {}, action: 'download' })
-      expect(data.rows.length).toBe(3)
+      expect(data.rows).toHaveLength(3)
     })
 
     test('should paginate results if action is not download', async () => {
       const data = await getPaymentData({ searchString: 'payee name', limit: 1, offset: 0, sortBy: 'score', filterBy: {} })
-      expect(data.rows.length).toBe(1)
+      expect(data.rows).toHaveLength(1)
       expect(data.rows[0].payee_name).toBe('payee name 1')
     })
 
     test('should offset results if action is not download and offset is greater than 0', async () => {
       const data = await getPaymentData({ searchString: 'payee name', limit: 1, offset: 1, sortBy: 'score', filterBy: {} })
-      expect(data.rows.length).toBe(1)
+      expect(data.rows).toHaveLength(1)
       expect(data.rows[0].payee_name).toBe('payee name 2')
     })
 
@@ -220,7 +220,7 @@ describe('search', () => {
     test('should restrict results to 6 suggestions', async () => {
       getDistinctPayees.mockResolvedValue(Array(50).fill().map((_, i) => ({ payee_name: `payee name ${i}`, part_postcode: 'part postcode', town: 'town', county_council: 'county council' })))
       const data = await getSearchSuggestions('payee name')
-      expect(data.rows.length).toBe(6)
+      expect(data.rows).toHaveLength(6)
     })
 
     test('should not throw when searchString exceeds 32 characters', async () => {

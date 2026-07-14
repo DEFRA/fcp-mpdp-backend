@@ -1,4 +1,4 @@
-import { Readable } from 'stream'
+import { Readable } from 'node:stream'
 import { AsyncParser } from '@json2csv/node'
 import { getAllPaymentsByPage } from './database.js'
 import { getPaymentData } from './search.js'

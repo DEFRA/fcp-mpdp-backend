@@ -103,9 +103,13 @@ describe('config', () => {
     expect(config.get('cdpEnvironment')).toBe('local')
   })
 
-  test('should return log enabled from environment variable', async () => {
+  test.each([
+    ['log.isEnabled'],
+    ['isSecureContextEnabled'],
+    ['isMetricsEnabled']
+  ])('should return %s as true from environment variable', async (key) => {
     const { config } = await import('../../src/config.js')
-    expect(config.get('log.isEnabled')).toBe(true)
+    expect(config.get(key)).toBe(true)
   })
 
   test('should default log enabled to true for non-test environments', async () => {
@@ -149,21 +153,11 @@ describe('config', () => {
     expect(config.get('httpProxy')).toBeNull()
   })
 
-  test('should return secure context enabled from environment variable', async () => {
-    const { config } = await import('../../src/config.js')
-    expect(config.get('isSecureContextEnabled')).toBe(true)
-  })
-
   test('should default secure context enabled to false for non-production environments', async () => {
     process.env.NODE_ENV = 'development'
     delete process.env.ENABLE_SECURE_CONTEXT
     const { config } = await import('../../src/config.js')
     expect(config.get('isSecureContextEnabled')).toBe(false)
-  })
-
-  test('should return metrics enabled from environment variable', async () => {
-    const { config } = await import('../../src/config.js')
-    expect(config.get('isMetricsEnabled')).toBe(true)
   })
 
   test('should default metrics enabled to false for non-production environments', async () => {
