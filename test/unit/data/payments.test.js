@@ -37,25 +37,13 @@ describe('payments', () => {
       })
     })
 
-    test('should return headers', async () => {
+    test.each([
+      ['headers', '"payee_name","part_postcode","town","county_council","amount"'],
+      ['amount with no decimal formatted to 2dp', '"payee name","part postcode","town","county council","100.00"'],
+      ['amount with decimal formatted to 2dp', '"payee name","part postcode","town","county council","200.00"']
+    ])('should contain %s in csv output', async (_, expected) => {
       const data = await getPaymentsCsv({})
-      expect(data).toContain('"payee_name","part_postcode","town","county_council","amount"')
-    })
-
-    test('should return data as csv', async () => {
-      const data = await getPaymentsCsv({})
-      expect(data).toContain('"payee name","part postcode","town","county council","100.00"')
-      expect(data).toContain('"payee name","part postcode","town","county council","200.00"')
-    })
-
-    test('should format amount when value has no decimal', async () => {
-      const data = await getPaymentsCsv({})
-      expect(data).toContain('"payee name","part postcode","town","county council","100.00"')
-    })
-
-    test('should format amount when value has decimal', async () => {
-      const data = await getPaymentsCsv({})
-      expect(data).toContain('"payee name","part postcode","town","county council","200.00"')
+      expect(data).toContain(expected)
     })
 
     test('should format amount when value is zero', async () => {
